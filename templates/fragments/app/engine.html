@@ -1,0 +1,303 @@
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org"
+>
+<head>
+</head>
+<body>
+<div th:fragment="engine">
+
+    <br>
+    <div class="container">
+        <form action="#" th:action="@{/createRecoScenario/{domain}(domain=${domain})}" method="POST">
+            <div class="row">
+                <div class="col-md-5"> <!-- Add new recommendation scenario -->
+
+                    <h3>
+                        <label th:title="${noEntities} ? 'There is nothing to recommend yet. Please go and create some entities in the Data Catalog view.'">
+                            Add New Scenario
+                            <i th:if="${noEntities}" class="bi bi-info-circle"></i>
+                        </label>
+                    </h3>
+                    <div th:if="${emptyScenarioName}" class="alert alert-danger alert-dismissible fade show" role="alert">
+                        <strong><i class="bi bi-exclamation-triangle-fill"></i> Error!</strong> Scenario name must not be empty!
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                    <div th:if="${invalidScenarioName}" class="alert alert-danger alert-dismissible fade show" role="alert">
+                        <strong><i class="bi bi-exclamation-triangle-fill"></i> Error!</strong> Scenario name must not contain dots, dashes or slashes!
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                    <div th:if="${scenarioExists}" class="alert alert-danger alert-dismissible fade show" role="alert">
+                        <strong><i class="bi bi-exclamation-triangle-fill"></i> Error!</strong> Scenario with a given name already exists!
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-6">
+                    <p class="text-start">Give a name to your recommendation scenario:</p>
+                    <div class="row">
+                        <div class="col-md-4">
+                            <label style="font-weight: bold">Scenario Name:</label>
+                        </div>
+                        <div class="col-md-8">
+                            <input type="text" class="form-control float-end" name="scenarioName" onkeyup="presentScenarioId(this.value)">
+                            <div id="engine" class="row card-columns text-center" style="padding-top: 10px;">
+                                <div class="col-md-12 domain-card">
+                                    <button type="submit" class="card-submit" name="scenarioType" value="custom"
+                                            th:disabled="${noEntities}">
+                                        <div class="card text-center fbh" th:style="${noEntities} ? 'background-color: darkgray'">
+                                            <div class="card-body">
+                                                <h4 style="margin-bottom: 0px;">
+                                                    CREATE SCENARIO
+                                                </h4>
+                                            </div>
+                                        </div>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-12" style="margin-top: 5px;">
+                            <span id="scenarioIdDynamicSpan"></span>
+                        </div>
+                    </div>
+                    <!--
+                    <table style="padding-left: 30px; border-collapse: separate; -webkit-border-horizontal-spacing: 20px;">
+                        <tr>
+                            <td><label style="font-weight: bold">Scenario Name:</label></td>
+                            <td><input type="text" class="form-control float-end" name="scenarioName" onkeyup="presentScenarioId(this.value)"></td>
+                        </tr>
+                        <tr id="scenarioIdDynamicSpanRow" hidden>
+                            <td colspan="2">
+                                <br>
+                                <span id="scenarioIdDynamicSpan"></span>
+                            </td>
+                        </tr>
+                    </table>
+                    -->
+                </div>
+
+                <div class="col-md-6"></div>
+                <div class="col-md-6 text-center" style="margin-top: 5px;">
+
+                    <!--
+                    <br>
+                    <br>
+                    <div class="row card-columns">
+                        <div class="col-md-3 domain-card d-flex align-items-stretch">
+                            <div class="card text-center syh" th:style="${noEntities} ? 'background-color: darkgray'">
+                                <div class="card-body d-flex align-items-center justify-content-center">
+                                    <h4 class="card-title">
+                                        <button type="submit" class="card-submit" name="scenarioType" value="custom"
+                                                th:disabled="${noEntities}">
+                                            Custom Scenario
+                                        </button>
+                                    </h4>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    -->
+                </div>
+            </div>
+        </form>
+
+        <br>
+        <div class="row">
+            <div class="col"> <!-- Existing recommendation scenarios -->
+
+                <h3>Recommendation Scenarios</h3>
+
+                <br>
+
+                <div th:if="${scenarioInvalidConfiguration != null}" class="alert alert-warning alert-dismissible fade show" role="alert">
+                    <strong><i class="bi bi-exclamation-triangle-fill"></i> Warning!</strong> <label th:text="${scenarioInvalidConfiguration}"></label>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+
+                <p th:if="${#lists.isEmpty(scenarios)}">Still no recommendation scenario? Why don't you create one?</p>
+
+                <table th:if="${not #lists.isEmpty(scenarios)}" class="table" style="border-collapse: separate; -webkit-border-horizontal-spacing: 10px;">
+                    <tr>
+                        <th scope="col">Scenario</th>
+                        <th scope="col">Algorithm</th>
+                        <th scope="col">Entity</th>
+                        <th scope="col">Status</th>
+                        <th scope="col" style="text-align: center">Action</th>
+                    </tr>
+                    <th:block th:each="entry : ${scenarios}">
+                        <tr>
+                            <td>
+                                <a th:href="'#collapse_' + ${entry.scenario?.id}" class="btn zbtn" data-bs-toggle="collapse">
+                                    <i class="bi bi-chevron-down"></i>
+                                    <label th:text="' ' + ${entry.scenario?.name}"></label>
+                                </a>
+                            </td>
+                            <td><label th:text="${entry.scenario?.recoModel}"></label></td>
+                            <td><label th:text="${entry.scenario?.recoEntity}"></label></td>
+                            <td>
+                                <small class="text-muted">
+                                    <span th:if="${entry.recoProfileExists == true && entry.scenario?.deployed == true}" class="badge bg-primary">online</span>
+                                    <span th:if="${entry.recoProfileExists == false}" class="badge bg-danger">offline</span>
+                                    <span th:if="${entry.recoProfileExists == true && entry.scenario?.deployed == false}" class="badge bg-warning">edit</span>
+                                </small>
+                            </td>
+                            <td style="text-align: center; vertical-align: middle;">
+                                <a type="button" class="btn btn-warning"
+                                   th:unless="${entry.scenario?.deployed}"
+                                   th:href="@{/viewScenario/{domain}/{scenarioName}(domain=${domain},scenarioName=${entry.scenario?.name})}">
+                                    Edit
+                                </a>
+                                <a th:if="${entry.scenario?.deployed}" type="button" class="btn sbtn"
+                                   th:href="@{/viewScenario/{domain}/{scenarioName}(domain=${domain},scenarioName=${entry.scenario?.name})}">
+                                    <span><i class="bi bi-search" aria-hidden="true"></i></span>
+                                    &nbsp;Preview
+                                </a>
+                                <a id="data-lock" th:unless="${entry.scenario?.deployed}" type="button" class="btn sbtn"
+                                   th:href="@{/deployScenario/{domain}/{scenarioName}(domain=${domain},scenarioName=${entry.scenario?.name})}">
+                                    <i class="bi bi-lock"></i>
+                                    <i class="bi bi-unlock"></i>
+                                    Deploy
+                                </a>
+                                <a id="data-unlock" th:if="${entry.scenario?.deployed}" type="button" class="btn wbtn"
+                                   th:attr="onclick=|passDataToModal('${domain}', '${entry.scenario?.name}')|"
+                                   th:attrappend="data-bs-toggle=${entry.scenario?.deployed == true} ? 'modal', data-bs-target=${entry.scenario?.deployed == true} ? '#deployModal'"
+                                   th:href="@{/deployScenario/{domain}/{scenarioName}(domain=${domain},scenarioName=${entry.scenario?.name})}">
+                                    <i class="bi bi-unlock"></i>
+                                    <i class="bi bi-lock"></i>
+                                    Configure
+                                </a>
+                                <a type="button" class="btn btn-danger"
+                                   th:href="@{/deleteScenario/{domain}/{scenarioName}(domain=${domain},scenarioName=${entry.scenario?.name})}">
+                                    Delete
+                                </a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="6" class="hiddenRow">
+                                <div th:id="'collapse_' + ${entry.scenario?.id}" class="collapse">
+                                    <div class="card text-dark syh mb-3">
+                                        <div class="card card-body">
+                                            <span th:if="${(entry.scenario?.itemContext == null && entry.scenario?.userType == 'registered') ||
+                                                           (entry.scenario?.itemContext == null && entry.scenario?.userType == null)}"
+                                                  th:utext="'curl --location --request GET \'' + ${spUrl} + '/recomm?' +
+                                                            '<br>' + 'scenarioId=' + ${entry.scenario?.scenarioId} + '&' +
+                                                            '<br>' + 'count=10&' +
+                                                            '<br>' + 'userId=some-user-id\'' +
+                                                            '<br>' + '--header \'x-api-key: ' + ${apiKey} + '\'' +
+                                                            '<br>' + '--header \'x-domain-id: ' + ${domainId} + '\''">
+                                            </span>
+                                            <span th:if="${entry.scenario?.itemContext == null && entry.scenario?.userType == 'anonymous'}"
+                                                  th:utext="'curl --location --request GET \'' + ${spUrl} + '/recomm?' +
+                                                            '<br>' + 'scenarioId=' + ${entry.scenario?.scenarioId} + '&' +
+                                                            '<br>' + 'count=10&' +
+                                                            '<br>' + 'sessionId=some-session-id\'' +
+                                                            '<br>' + '--header \'x-api-key: ' + ${apiKey} + '\'' +
+                                                            '<br>' + '--header \'x-domain-id: ' + ${domainId} + '\''">
+                                            </span>
+                                            <span th:if="${entry.scenario?.itemContext == null && entry.scenario?.userType == 'both'}"
+                                                  th:utext="'curl --location --request GET \'' + ${spUrl} + '/recomm?' +
+                                                            '<br>' + 'scenarioId=' + ${entry.scenario?.scenarioId} + '&' +
+                                                            '<br>' + 'count=10&' +
+                                                            '<br>' + 'userId=some-user-id\'' +
+                                                            '<br>' + 'sessionId=some-session-id\'' +
+                                                            '<br>' + '--header \'x-api-key: ' + ${apiKey} + '\'' +
+                                                            '<br>' + '--header \'x-domain-id: ' + ${domainId} + '\''">
+                                            </span>
+                                            <span th:if="${entry.scenario?.itemContext != null && entry.scenario?.userType == 'anonymous'}"
+                                                  th:utext="'curl --location --request GET \'' + ${spUrl} + '/recomm?' +
+                                                            '<br>' + 'scenarioId=' + ${entry.scenario?.scenarioId} + '&' +
+                                                            '<br>' + 'count=10&' +
+                                                            '<br>' + 'itemId=some-item-id&' +
+                                                            '<br>' + 'sessionId=some-session-id\'' +
+                                                            '<br>' + '--header \'x-api-key: ' + ${apiKey} + '\'' +
+                                                            '<br>' + '--header \'x-domain-id: ' + ${domainId} + '\''">
+                                            </span>
+                                            <span th:if="${entry.scenario?.itemContext != null && entry.scenario?.userType == 'registered'}"
+                                                  th:utext="'curl --location --request GET \'' + ${spUrl} + '/recomm?' +
+                                                            '<br>' + 'scenarioId=' + ${entry.scenario?.scenarioId} + '&' +
+                                                            '<br>' + 'count=10&' +
+                                                            '<br>' + 'itemId=some-item-id&' +
+                                                            '<br>' + 'userId=some-user-id\'' +
+                                                            '<br>' + '--header \'x-api-key: ' + ${apiKey} + '\'' +
+                                                            '<br>' + '--header \'x-domain-id: ' + ${domainId} + '\''">
+                                            </span>
+                                            <span th:if="${entry.scenario?.itemContext != null && entry.scenario?.userType == 'both'}"
+                                                  th:utext="'curl --location --request GET \'' + ${spUrl} + '/recomm?' +
+                                                            '<br>' + 'scenarioId=' + ${entry.scenario?.scenarioId} + '&' +
+                                                            '<br>' + 'count=10&' +
+                                                            '<br>' + 'itemId=some-item-id&' +
+                                                            '<br>' + 'userId=some-user-id\'' +
+                                                            '<br>' + 'sessionId=some-session-id\'' +
+                                                            '<br>' + '--header \'x-api-key: ' + ${apiKey} + '\'' +
+                                                            '<br>' + '--header \'x-domain-id: ' + ${domainId} + '\''">
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                    </th:block>
+                </table>
+
+            </div>
+        </div>
+
+        <!-- Enable Scenario Configuration Change Modal -->
+        <div class="modal fade" id="deployModal" tabindex="-1" aria-labelledby="deployModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="deployModalLabel">Enable configuration?</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        Are you sure you want to enable scenario configuration?
+                        Previously stored configurations will be overwritten and new recommendation profile will be created.
+                        Consequences of this action can not be undone.
+                    </div>
+                    <div class="modal-footer">
+                        <a id="enableEditButton" type="button" class="btn sbtn">Enable</a>
+                        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <script th:inline="javascript">
+
+            /**
+             * Adds proper values to href tag of the Enable button for enabling scenario configuration.
+             *
+             * @param domain        related domain which scenario is being involved in action
+             * @param scenarioName  scenario name involved in action
+             */
+            function passDataToModal(domain, scenarioName) {
+                let enableConfigurationModalButton = document.getElementById('enableEditButton');
+                enableConfigurationModalButton.href = '/enableScenarioConfiguration/' + domain + '/' + scenarioName;
+            }
+
+            /**
+             * Function responsible for dynamic presentation of scenario id based on input value for scenario name.
+             *
+             * @param inputValue input value from scenario name input field
+             */
+            function presentScenarioId(inputValue) {
+                const fixPart = 'Scenario ID: ';
+                let scenarioIdDynamicSpan = document.getElementById("scenarioIdDynamicSpan");
+                scenarioIdDynamicSpan.innerHTML = fixPart + inputValue.split(/[\s]+/).join("-").toLowerCase();
+
+                let scenarioIdDynamicSpanRow = document.getElementById("scenarioIdDynamicSpanRow");
+                if (inputValue.length > 0) {
+                    scenarioIdDynamicSpanRow.hidden = false;
+                } else {
+                    scenarioIdDynamicSpanRow.hidden = true;
+                }
+            }
+        </script>
+    </div>
+</div>
+</body>
+</html>

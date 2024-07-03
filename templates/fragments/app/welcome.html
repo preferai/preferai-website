@@ -1,0 +1,156 @@
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head>
+</head>
+<body>
+<div th:fragment="welcome" id="welcome">
+
+    <div class="container fb">
+
+        <div class="row" style="padding-bottom: 15px">
+
+            <div th:each="d,rowStatus : ${domains}" class="row card-columns" th:if="${rowStatus.index % 3} == 0">
+
+                <div th:each="d,interestStatus : ${domains}" class="col-md-4 domain-card"
+                     th:if="${interestStatus.index lt rowStatus.index + 3 and interestStatus.index ge rowStatus.index}">
+
+                    <a th:href="@{/user(view='catalog', domain=${d.name})}">
+                        <div class="card text-center syh" style="min-height: 155px;">
+                            <div class="card-body">
+                                <h4 class="card-title" th:text="${d.name}"></h4>
+                                <p class="card-text">
+                                    <br/>
+                                    <small class="">DOMAIN ID:<br/> <span style="font-weight: bold" th:text="${d.id}"></span></small>
+                                    <br/>
+                                </p>
+                            </div>
+                        </div>
+                    </a>
+
+                </div>
+
+                <!-- After the last domain, add the "Add domain" button if there is still space -->
+
+                <div class="col-md-4 domain-card"
+                     tabindex="0" data-bs-toggle="tooltip" data-bs-placement="top"
+                     th:title="${session.disableAddDomain}?
+                                      'Max no. of domains reached. Contact us for account upgrade if more domains are needed.'"
+                     th:if="${domains.size() % 3 != 0 and (rowStatus.index + 3) > domains.size()}">
+
+                    <a th:href="${!session.disableAddDomain} ? @{/user(view='domains')}"
+                       th:classappend="${session.disableAddDomain} ? adisabled">
+                        <div class="card text-center sbtn2"  style="min-height: 155px;">
+                            <div class="card-body">
+                                <br/>
+                                <h4 class="card-title"><i class="bi bi-plus-lg" aria-hidden="true"></i></h4>
+                                <h4 class="card-title">Domain</h4>
+
+
+                                <span class="d-inline-block"
+                                      th:if="${session.disableAddDomain}">
+                                    <i class="bi bi-question-circle fa-lg"></i>
+                                </span>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+
+            </div>
+
+            <!-- If the last row is already used for displaying domains, make a new row for the "Add Domain" button -->
+
+            <div class="row card-columns" th:if="${domains.size() % 3} == 0">
+                <div class="col-md-4 domain-card"
+                     tabindex="0" data-bs-toggle="tooltip" data-bs-placement="top"
+                     th:title="${session.disableAddDomain}?
+                                      'Max no. of domains reached. Contact us for account upgrade if more domains are needed.'">
+
+                    <a th:href="${!session.disableAddDomain} ? @{/user(view='domains')}"  th:classappend="${session.disableAddDomain} ? adisabled">
+                        <div class="card text-center sbtn2"  style="min-height: 155px;">
+                            <div class="card-body">
+                                <br/>
+                                <h4 class="card-title"><i class="bi bi-plus-lg" aria-hidden="true"></i></h4>
+                                <h4 class="card-title">Domain</h4>
+
+                                <span class="d-inline-block"
+                                      th:if="${session.disableAddDomain}">
+                                    <i class="bi bi-question-circle fa-lg"></i>
+                                </span>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+            </div>
+
+            <!--
+            <div class="row text-align-right" style="padding-top: 15px; padding-bottom: 30px;">
+                <div class="col-md-2 offset-md-10">
+                    <span id="tip" class="d-inline-block" tabindex="0" data-bs-toggle="tooltip"
+                          th:title="${session.disableAddDomain}? 'Max no. of domains reached. Contact us for account upgrade if more domains are needed.'">
+                        <a th:unless="${session.disableAddDomain}" type="button" class="btn sbtn" th:href="@{/user(view='domains')}">
+                            <span><i class="bi bi-plus-lg" aria-hidden="true"></i></span>
+                            Add Domain
+                        </a>
+                        <button th:if="${session.disableAddDomain}" type="button" class="btn sbtn" disabled>
+                            <span><i class="bi bi-plus-lg" aria-hidden="true"></i></span>
+                            Add Domain
+                            <i class="bi bi-question-circle"></i>
+                        </button>
+                    </span>
+                </div>
+            </div>
+            -->
+            <br>
+            <h5>Account Status</h5>
+            <br>
+
+            <div class="col-md-12">
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                        <tr>
+                            <th scope="col"></th>
+                            <th scope="col">Subscription Plan</th>
+                            <th scope="col">Domains</th>
+                            <th scope="col">Recommendation Requests</th>
+                            <th scope="col">Items</th>
+                            <th scope="col">Users</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr>
+                            <th scope="row">#</th>
+                            <td><span th:text="${role}"></span></td>
+                            <td><span th:text="${nodomains}"></span></td>
+                            <td><span th:text="${norequests}"></span></td>
+                            <td><span th:text="${noitems}"></span></td>
+                            <td><span th:text="${nousers}"></span></td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <br>
+                <h5>API Configuration</h5>
+                <br>
+
+                <table class="table">
+                    <tbody>
+                    <tr>
+                        <th scope="row">API Key</th>
+                        <td><span th:text="${apiKey}"></span></td>
+                    </tr>
+                    </tbody>
+                </table>
+
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>
+<script>
+    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+    var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+        return new bootstrap.Tooltip(tooltipTriggerEl)
+    })
+
+</script>

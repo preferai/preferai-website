@@ -1,0 +1,404 @@
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head>
+</head>
+<body>
+<div th:fragment="catalog" id="catalog">
+
+
+
+    <div class="container-fluid">
+        <div class="row fb" style="padding-bottom: 15px">
+            <!--
+                       <div>
+                           <div class="card text-dark gch mb-3">
+                               <div class="card-body">
+
+                                   <h5 class="card-title fb">About</h5>
+                                   <p class="card-text">
+                                       In order to use the available recommendation services, every application domain needs to have a data catalog configured.
+                                       We can recommend almost any type of content (e.g., products, news articles, jobs, etc.), but in order to do so, you first
+                                       have to tell us what kind of data you have at your disposal.
+                                   </p>
+
+                                   <h5 class="card-title fb">Items</h5>
+                                       <p class="card-text">
+                                           The first thing we need to find out is what should be recommended. Are we talking about a product, a news article or a job posting?
+                                           Once we know that, we also need to define what features (e.g., a category in case of products or the raw text from the news article) are available for each item.
+                                       </p>
+                                   <h5 class="card-title fb">Interactions</h5>
+                                   <p class="card-text">
+                                       We can recommend almost any type of content (e.g., products, news articles, jobs, etc.), but in order to do so, you first
+                                       have to tell us what kind of data you have at your disposal.
+                                   </p>
+                               </div>
+                           </div>
+                       </div>
+           -->
+            <!-- Interactions core empty warning alert -->
+            <div th:if="${interactionsEmpty}" id="alert" class="alert alert-warning alert-dismissible fade show" role="alert">
+                <strong><i class="bi bi-exclamation-triangle-fill"></i> Warning!</strong> You didn't define any user interaction type.
+                <button id="close-alert" type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+
+            <div class="row card-columns justify-content-md-center">
+                <div class="col-md-4 domain-card">
+                    <div class="card text-left gch">
+                        <div class="card-body">
+                            <h4 class="card-title">Items</h4>
+
+                            <div style="margin-bottom: 15px;">
+                                <img class="rounded mx-auto d-block img-fluid" th:src="@{img/dashboard/items_nodata.png}"
+                                     alt="Item Details" style="margin-top:-8px; max-height: 120px;"
+                                />
+                            </div>
+                            <div class="card text-dark syh mb-3">
+                                <div class="card-body">
+                                    <p class="card-text">
+                                        What should be <span class="fb">recommended</span>? A product, a news article or a job posting? <br/>
+                                        What <span class="fb">attributes</span> are available for each item? A categorical or a plain text description?
+                                    </p>
+                                </div>
+                            </div>
+
+
+                            <p class="card-text">
+
+                                <small class="text-muted">Status:
+                                    <span th:if="${domainStatus == 'online' && disableDeployDomain == true}" class="badge bg-primary" th:text="${domainStatus}"></span>
+                                    <span th:if="${domainStatus == 'offline'}" class="badge bg-danger" th:text="${domainStatus}"></span>
+                                    <span th:if="${domainStatus == 'online' && disableDeployDomain == false}" class="badge bg-warning">edit</span>
+                                </small>
+
+                                <span class="d-inline-block" style="float: right" tabindex="0" data-bs-toggle="tooltip"
+                                      th:title="${disableDeployDomain}? 'You need to unlock domain configuration to enabe editing.'">
+                                    <a th:unless="${disableDeployDomain}" type="button" class="btn sbtn" th:href="@{/user(view='items', domain=${domain})}">
+                                        <span><i class="bi bi-wrench" aria-hidden="true"></i></span>
+                                        &nbsp;Configure
+                                    </a>
+                                    <a th:if="${disableDeployDomain}" type="button" class="btn sbtn" th:href="@{/user(view='items', domain=${domain})}">
+                                        <span><i class="bi bi-search" aria-hidden="true"></i></span>
+                                        &nbsp;Preview
+                                    </a>
+                                </span>
+
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 domain-card">
+                    <div class="card text-left gch">
+                        <div class="card-body">
+                            <h4 class="card-title">Interactions</h4>
+
+                            <div style="margin-bottom: 15px;">
+                                <img class="rounded mx-auto d-block img-fluid" th:src="@{img/dashboard/interaction_details.png}"
+                                     alt="Item Details" style="margin-top:-8px; max-height: 120px;"
+                                />
+                            </div>
+
+                            <div class="card text-dark syh mb-3">
+                                <div class="card-body">
+                                    <p class="card-text">
+                                        How do the users <span class="fb">interact</span> with the items which we want to recommend? <br/>
+                                        Are they buying, viewing or rating them? Are they registered users or anonymous?
+                                    </p>
+                                </div>
+                            </div>
+
+                            <p class="card-text">
+                                <small class="text-muted">Status:
+                                    <span th:if="${domainStatus == 'online' && disableDeployDomain == true}" class="badge bg-primary" th:text="${domainStatus}"></span>
+                                    <span th:if="${domainStatus == 'offline'}" class="badge bg-danger" th:text="${domainStatus}"></span>
+                                    <span th:if="${domainStatus == 'online' && disableDeployDomain == false}" class="badge bg-warning">edit</span>
+                                </small>
+
+                                <span class="d-inline-block" style="float: right" tabindex="0" data-bs-toggle="tooltip"
+                                      th:title="${disableDeployDomain}? 'You need to unlock domain configuration to enabe editing.'">
+                                    <a th:unless="${disableDeployDomain}" type="button" class="btn sbtn" th:href="@{/user(view='interactions', domain=${domain})}">
+                                        <span><i class="bi bi-wrench" aria-hidden="true"></i></span>
+                                        &nbsp;Configure
+                                    </a>
+                                    <a th:if="${disableDeployDomain}" type="button" class="btn sbtn" th:href="@{/user(view='interactions', domain=${domain})}">
+                                        <span><i class="bi bi-search" aria-hidden="true"></i></span>
+                                        &nbsp;Preview
+                                    </a>
+                                </span>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 domain-card">
+                    <div class="card text-left gch">
+                        <div class="card-body">
+                            <h4 class="card-title">Users</h4>
+
+                            <div style="margin-bottom: 15px;">
+                                <img class="rounded mx-auto d-block img-fluid" th:src="@{img/dashboard/users_details.png}"
+                                     alt="User Details" style="margin-top:-8px; max-height: 120px;"
+                                />
+                            </div>
+                            <div class="card text-dark syh mb-3">
+                                <div class="card-body">
+                                    <p class="card-text">
+                                        What <span class="fb">kind</span> of users do you have? A customer, a reviewer or a company perhaps? <br/>
+                                        What <span class="fb">attributes</span> are available for each user? A categorical or a plain text description?
+                                    </p>
+                                </div>
+                            </div>
+
+
+                            <p class="card-text">
+
+                                <small class="text-muted">Status:
+                                    <span th:if="${domainStatus == 'online' && disableDeployDomain == true}" class="badge bg-primary" th:text="${domainStatus}"></span>
+                                    <span th:if="${domainStatus == 'offline'}" class="badge bg-danger" th:text="${domainStatus}"></span>
+                                    <span th:if="${domainStatus == 'online' && disableDeployDomain == false}" class="badge bg-warning">edit</span>
+                                </small>
+
+                                <span class="d-inline-block" style="float: right" tabindex="0" data-bs-toggle="tooltip"
+                                      th:title="${disableDeployDomain}? 'You need to unlock domain configuration to enabe editing.'">
+                                    <a th:unless="${disableDeployDomain}" type="button" class="btn sbtn" th:href="@{/user(view='users', domain=${domain})}">
+                                        <span><i class="bi bi-wrench" aria-hidden="true"></i></span>
+                                        &nbsp;Configure
+                                    </a>
+                                    <a th:if="${disableDeployDomain}" type="button" class="btn sbtn" th:href="@{/user(view='users', domain=${domain})}">
+                                        <span><i class="bi bi-search" aria-hidden="true"></i></span>
+                                        &nbsp;Preview
+                                    </a>
+                                </span>
+
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row justify-content-md-center">
+                <div class="col-md-2 text-center">
+                    <a id="data-lock" th:unless="${disableDeployDomain}" type="button" class="btn sbtn"
+                       th:href="@{/deploy/{domain}(domain=${domain})}">
+                        <i class="bi bi-lock"></i>
+                        <i class="bi bi-unlock"></i>
+                        Deploy Services
+                    </a>
+                    <a id="data-unlock" th:if="${disableDeployDomain}" type="button" class="btn wbtn"
+                       th:attrappend="data-bs-toggle=${domainStatus == 'online'} ? 'modal', data-bs-target=${domainStatus == 'online'} ? '#deployModal'"
+                       th:href="${domainStatus == 'offline'} ? @{/configure/{domain}(domain=${domain})}">
+                        <i class="bi bi-unlock"></i>
+                        <i class="bi bi-lock"></i>
+                        Reconfigure Services
+                    </a>
+                </div>
+            </div>
+
+            <div>
+                <div class="card text-dark gch mb-3">
+                    <div class="card-body">
+
+                        <h4 class="card-title fb">Data Services</h4>
+
+                        <p class="card-text">Use the following API to upload your data:</p>
+
+                        <h5 class="card-title fb" th:if="${diItemsEntitiesMap.size() > 0}">Item Data</h5>
+                        <div class="accordion accordion-flush" id="accordionFlushExample" style="margin-top: 10px; margin-bottom: 10px;">
+                            <!-- Item Services -->
+                            <div class="accordion-item" th:each="entity : ${diItemsEntitiesMap}">
+                                <h2 class="accordion-header" th:id="'flush-heading'+${#strings.replace(#strings.replace(#strings.replace(entity.key, '/', ''),':',''),'.','')}">
+                                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" aria-expanded="false"
+                                            th:attr="data-bs-target='#flush-collapse-'+${#strings.replace(#strings.replace(#strings.replace(entity.key, '/', ''),':',''),'.','')},aria-controls='flush-collapse-'+${#strings.replace(#strings.replace(#strings.replace(entity.key, '/', ''),':',''),'.','')}">
+                                        <span th:text="${entity.key}"></span>
+                                    </button>
+                                </h2>
+                                <div class="accordion-collapse collapse" data-bs-parent="#accordionFlushExample"
+                                     th:id="'flush-collapse-'+${#strings.replace(#strings.replace(#strings.replace(entity.key, '/', ''),':',''),'.','')}"
+                                     th:attr="aria-labelledby='flush-heading-'+${#strings.replace(#strings.replace(#strings.replace(entity.key, '/', ''),':',''),'.','')}">
+
+                                    <div class="card text-dark syh mb-3">
+                                        <div class="card-body">
+                                            <p class="card-text">
+                                        <span th:utext="'curl --location --request POST \'<span class=\'fb\'>' + ${entity.key} +
+                                        '</span>\'<br>' + '--header \'<span class=\'fb\'>x-api-key: ' + ${apiKey} + '</span>\'<br>' + '--header \'<span class=\'fb\'>x-domain-id: ' +
+                                        ${domainId} + '</span>\'<br>' + '--header \'Content-Type: application/json\'<br>' +
+                                        '--data-raw'"></span><pre style="line-height: 1.5em; margin: 0;" th:text="'\'' + ${entity.value} + '\''"></pre>
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+
+                        <h5 class="card-title fb" style="margin-top: 5px;" th:if="${diItemsEntitiesMap.size() > 0}">Interaction Data</h5>
+                        <div class="accordion accordion-flush" id="accordionFlushExample" style="margin-top: 10px; margin-bottom: 10px;">
+                            <!-- Interaction Services -->
+                            <div class="accordion-item">
+                                <h2 class="accordion-header" th:id="'flush-heading'+${#strings.replace(#strings.replace(#strings.replace(diInteractionsUrl, '/', ''),':',''),'.','')}">
+                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" aria-expanded="false"
+                                            th:attr="data-bs-target='#flush-collapse-'+${#strings.replace(#strings.replace(#strings.replace(diInteractionsUrl, '/', ''),':',''),'.','')},aria-controls='flush-collapse-'+${#strings.replace(#strings.replace(#strings.replace(diInteractionsUrl, '/', ''),':',''),'.','')}">
+                                        <span th:text="${diInteractionsUrl}"></span>
+                                    </button>
+                                </h2>
+                                <div class="accordion-collapse collapse" data-bs-parent="#accordionFlushExample"
+                                     th:id="'flush-collapse-'+${#strings.replace(#strings.replace(#strings.replace(diInteractionsUrl, '/', ''),':',''),'.','')}"
+                                     th:attr="aria-labelledby='flush-heading-'+${#strings.replace(#strings.replace(#strings.replace(diInteractionsUrl, '/', ''),':',''),'.','')}">
+
+                                    <div class="card text-dark syh mb-3">
+                                        <div class="card-body">
+                                            <p class="card-text">
+                                        <span th:utext="'curl --location --request POST \'<span class=\'fb\'>' + ${diInteractionsUrl} +
+                                        '</span>\' <br>' + '--header \'<span class=\'fb\'>x-api-key: ' + ${apiKey} + '</span>\'<br>' + '--header \'<span class=\'fb\'>x-domain-id: ' +
+                                        ${domainId} + '</span>\'<br>' + '--header \'Content-Type: application/json\'<br>' +
+                                        '--data-raw'"></span><pre style="line-height: 1.5em; margin: 0;" th:text="'\'' + ${diInteractionsJson} + '\''"></pre>
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <h5 class="card-title fb" style="margin-top: 5px;" th:if="${diUsersEntitiesMap.size() > 0}">User Data</h5>
+                        <div class="accordion accordion-flush" id="accordionFlushExample" style="margin-top: 10px; margin-bottom: 10px;">
+                            <!-- User Services -->
+                            <div class="accordion-item" th:each="entity : ${diUsersEntitiesMap}">
+                                <h2 class="accordion-header" th:id="'flush-heading'+${#strings.replace(#strings.replace(#strings.replace(entity.key, '/', ''),':',''),'.','')}">
+                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" aria-expanded="false"
+                                            th:attr="data-bs-target='#flush-collapse-'+${#strings.replace(#strings.replace(#strings.replace(entity.key, '/', ''),':',''),'.','')},aria-controls='flush-collapse-'+${#strings.replace(#strings.replace(#strings.replace(entity.key, '/', ''),':',''),'.','')}">
+                                        <span th:text="${entity.key}"></span>
+                                    </button>
+                                </h2>
+                                <div class="accordion-collapse collapse" data-bs-parent="#accordionFlushExample"
+                                     th:id="'flush-collapse-'+${#strings.replace(#strings.replace(#strings.replace(entity.key, '/', ''),':',''),'.','')}"
+                                     th:attr="aria-labelledby='flush-heading-'+${#strings.replace(#strings.replace(#strings.replace(entity.key, '/', ''),':',''),'.','')}">
+
+                                    <div class="card text-dark syh mb-3">
+                                        <div class="card-body">
+                                            <p class="card-text">
+                                        <span th:utext="'curl --location --request POST \'<span class=\'fb\'>' + ${entity.key} +
+                                        '</span>\'<br>' + '--header \'<span class=\'fb\'>x-api-key: ' + ${apiKey} + '</span>\'<br>' + '--header \'<span class=\'fb\'>x-domain-id: ' +
+                                        ${domainId} + '</span>\'<br>' + '--header \'Content-Type: application/json\'<br>' +
+                                        '--data-raw'"></span><pre style="line-height: 1.5em; margin: 0;" th:text="'\'' + ${entity.value} + '\''"></pre>
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <br/>
+                        <p class="card-text">Please do not forget to <span class="fb">add the following request headers</span> while sending the data with the above configured services:</p>
+
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="table-responsive-md">
+                                    <table style="border-collapse: separate; -webkit-border-horizontal-spacing: 10px;" class="table">
+                                        <tr>
+                                            <td><label>x-domain-id:</label></td>
+                                            <td><span style="font-weight: bold" th:text="${domainId}"></span></td>
+                                        </tr>
+                                        <tr>
+                                            <td><label>x-api-key:</label></td>
+                                            <td><span style="font-weight: bold" th:text="${apiKey}"></span></td>
+                                        </tr>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+
+
+
+
+
+
+            <!--
+                        <hr style="height:10px; visibility:hidden;">
+
+                        <div class="row">
+                            <h4>Data Ingestion service</h4>
+                            <br/><br/>
+                            <div class="col-md-12">
+                                <table class="table">
+                                    <thead class="table-secondary">
+                                    <tr>
+                                        <th scope="col">Url</th>
+                                        <th scope="col">JSON body</th>
+                                        <th scope="col">Curl Request</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <tr th:each="entity : ${diItemsEntitiesMap}">
+                                        <td><span th:text="${entity.key}"></span></td>
+                                        <td><pre th:text="${entity.value}"></pre></td>
+                                        <td><span th:utext="'curl --location --request POST \'' + ${entity.key} + '\'<br>' + '--header \'x-api-key: ' + ${apiKey} + '\'<br>' + '--header \'x-domain-id: ' + ${domainId} + '\'<br>' + '--header \'Content-Type: application/json\'<br>' + '--data-raw'"></span><pre th:text="'\'' + ${entity.value} + '\''"></pre></td>
+                                    </tr>
+                                    <tr>
+                                        <td><span th:text="${diInteractionsUrl}"></span></td>
+                                        <td><pre th:text="${diInteractionsJson}"></pre></td>
+                                        <td><span th:utext="'curl --location --request POST \'' + ${diInteractionsUrl} + '\'<br>' + '--header \'x-api-key: ' + ${apiKey} + '\'<br>' + '--header \'x-domain-id: ' + ${domainId} + '\'<br>' + '--header \'Content-Type: application/json\'<br>' + '--data-raw'"></span><pre th:text="'\'' + ${diInteractionsJson} + '\''"></pre></td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+            -->
+
+            <div class="row">
+                <div class="col-md-12">
+
+                    <!-- Button trigger modal -->
+                    <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteModal">Delete Domain</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Domain Deploy Changes Modal -->
+        <div class="modal fade" id="deployModal" tabindex="-1" aria-labelledby="deployModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="deployModalLabel">Enable configuration?</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        Are you sure you want to enable configuration?
+                        If any existing field gets deleted, related data will be lost.
+                        Also keep in mind that if a new field is going to be added, existing data will not have a value
+                        defined for that specific field. Thus, new data import will be required with provided value for
+                        each new added field.
+                    </div>
+                    <div class="modal-footer">
+                        <a th:href="@{/configure/{domain}(domain=${domain})}" type="button" class="btn sbtn">Enable</a>
+                        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Domain Delete Modal -->
+        <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="deleteModalLabel">Delete domain</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        Are you sure you want to delete this domain?
+                        All configurations will be lost and related data will be ignored by the recommender.
+                        Consequences of this action can not be undone!
+                    </div>
+                    <div class="modal-footer">
+                        <a th:href="@{/delete/{domain}(domain=${domain})}" type="button" class="btn btn-danger" style="color: white">Delete</a>
+                        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

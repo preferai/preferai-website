@@ -1,0 +1,352 @@
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head>
+</head>
+<body>
+<div th:fragment="items">
+
+    <br>
+
+    <div th:if="${catalogConfigurationEnabled}">
+
+        <form action="#" th:action="@{/storeItemsEntity/{domain}(domain=${domain})}" method="POST">
+            <div class="row">
+
+                <div class="col-md-4 offset-md-2 align-self-center">
+
+                    <h3>What would you like to recommend?</h3>
+                    <div class="row" style="margin-bottom: 10px;">
+                        <div class="col-md-12">
+                            <input type="text" class="form-control" name="entity" placeholder="product, article, job..."
+                                   style="width: 90%"
+                                   data-bs-toggle="tooltip" data-bs-placement="top" title="Use only lowercase letters!">
+                        </div>
+                    </div>
+                    <div class="row" style="margin-bottom: 10px;">
+                        <div class="col-md-12">
+                            <input class="btn sbtn" type="submit" value="Add Item Entity">
+                        </div>
+                    </div>
+
+                </div>
+                <div class="col-md-4 align-self-center"  style="padding-left: 10px;">
+                    <img th:src="@{img/dashboard/items_details.png}"
+                         alt="Item Details" width="90%"
+                    />
+                </div>
+
+            </div>
+        </form>
+
+        <br>
+        <h3 th:if="not ${entitiesFieldsMap.isEmpty()}">Item Entities:</h3>
+
+
+
+        <br th:if="${emptyEntity} or ${invalidEntity} or ${entityExists} or ${fieldExists} or ${emptyField} or ${invalidType} or ${invalidSubtype}">
+
+        <div th:if="${entityExists}" class="alert alert-danger alert-dismissible fade show" role="alert">
+            <strong><i class="bi bi-exclamation-triangle-fill"></i> Error!</strong> Entity already exists!
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        <div th:if="${invalidEntity}" class="alert alert-danger alert-dismissible fade show" role="alert">
+            <strong><i class="bi bi-exclamation-triangle-fill"></i> Error!</strong> Field name must contain only lowercase letters!
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        <div th:if="${emptyEntity}" class="alert alert-danger alert-dismissible fade show" role="alert">
+            <strong><i class="bi bi-exclamation-triangle-fill"></i> Error!</strong> Entity name must not be empty!
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+
+        <div th:if="${reservedFieldNameError}" class="alert alert-danger alert-dismissible fade show" role="alert">
+            <strong><i class="bi bi-exclamation-triangle-fill"></i> Error!</strong> Submitted field name is already in use by the system. Please choose a different field name.
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        <div th:if="${fieldExists}" class="alert alert-danger alert-dismissible fade show" role="alert">
+            <strong><i class="bi bi-exclamation-triangle-fill"></i> Error!</strong> Field with provided name and different configurations already exists! Please choose a different name.
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        <div th:if="${emptyField}" class="alert alert-danger alert-dismissible fade show" role="alert">
+            <strong><i class="bi bi-exclamation-triangle-fill"></i> Error!</strong> Field name must not be empty!
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        <div th:if="${invalidType}" class="alert alert-danger alert-dismissible fade show" role="alert">
+            <strong><i class="bi bi-exclamation-triangle-fill"></i> Error!</strong> Field type must not be empty!
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        <div th:if="${invalidSubtype}" class="alert alert-danger alert-dismissible fade show" role="alert">
+            <strong><i class="bi bi-exclamation-triangle-fill"></i> Error!</strong> Field subtype must not be empty!
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+
+
+        <div th:if="not ${entitiesFieldsMap.isEmpty()}">
+
+            <div th:each="entry : ${entitiesFieldsMap}">
+
+                <hr style="height:5px; visibility:hidden;">
+                <hr style="border: 2px solid">
+                <hr style="height:5px; visibility:hidden;">
+
+                <table style="border-collapse: separate; -webkit-border-horizontal-spacing: 10px;">
+                    <tr>
+                        <td>Available attributes for entity: <strong th:text="${entry.key}"></strong></td>
+                        <td>
+                            <a type="button" class="btn btn-danger"
+                               th:href="@{/deleteEntity/{domain}/{entity}(domain=${domain},entity=${entry.key})}">
+                                Delete
+                            </a>
+                        </td>
+                    </tr>
+                </table>
+
+                <hr style="height:5px; visibility:hidden;">
+
+                <table class="table">
+                    <thead class="table-secondary">
+                    <tr>
+                        <th scope="col">Field Name</th>
+                        <th scope="col">Field Type</th>
+                        <th scope="col">Field Subtype</th>
+                        <th scope="col">Action</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr>
+                        <td>id</td>
+                        <td>Categorical Text</td>
+                        <td>Single Value</td>
+                        <td></td>
+                    </tr>
+                    <tr th:each="f: ${entry.value}">
+                        <form action="#"
+                              th:action="@{/deleteField/{domain}/{entity}/{field}(domain=${domain},entity=${entry.key},field=${f.name})}"
+                              method="POST">
+                            <td th:value="f.name" th:text="${f.name}"></td>
+                            <td th:value="f.type" th:text="${f.type}"></td>
+                            <td th:value="f.subtype" th:text="${f.subtype}"></td>
+                            <td>
+                                <button type="submit" name="delete" class="btn btn-outline-danger">Delete</button>
+                            </td>
+                        </form>
+                    </tr>
+                    <tr>
+                        <form action="#"
+                              th:action="@{/addField/{domain}/{entity}(domain=${domain},entity=${entry.key})}"
+                              method="POST">
+                            <td><input type="text" class="form-control" name="name"></td>
+                            <td>
+                                <select name="type" th:id="'dataType_' + ${entry.key}" class="form-select"
+                                        onchange="showRelatedSubtypes(this.value, this.id)">
+                                    <option value="" selected disabled hidden>Choose Type</option>
+                                    <option th:each="e: ${dataTypesMap}"
+                                            th:value="${e.key}"
+                                            th:text="${e.key}"></option>
+                                </select>
+                            </td>
+                            <td>
+                                <select name="subtype" th:id="'numericSubtypes_' + ${entry.key}" class="form-select" style="display: none">
+                                    <option value="" selected disabled hidden>Choose Subtype</option>
+                                    <option th:each="s: ${numericSubtypes}"
+                                            th:value="${s}"
+                                            th:text="${s}"></option>
+                                </select>
+                                <select name="subtype" th:id="'freeTextSubtypes_' + ${entry.key}" class="form-select" style="display: none">
+                                    <option value="" selected disabled hidden>Choose Subtype</option>
+                                    <option th:each="s: ${freeTextSubtypes}"
+                                            th:value="${s}"
+                                            th:text="${s}"></option>
+                                </select>
+                                <select name="subtype" th:id="'categoricalTextSubtypes_' + ${entry.key}" class="form-select" style="display: none">
+                                    <option value="" selected disabled hidden>Choose Subtype</option>
+                                    <option th:each="s: ${categoricalTextSubtypes}"
+                                            th:value="${s}"
+                                            th:text="${s}"></option>
+                                </select>
+                            </td>
+                            <td>
+                                <button type="submit" class="btn btn-outline-success">Add</button>
+                            </td>
+                        </form>
+                    </tr>
+                    </tbody>
+                </table>
+
+                <script th:inline="javascript">
+                    function showRelatedSubtypes(type, elementId) {
+                        let entity = elementId.split('_')[1];
+
+                        if (type === 'Numeric') {
+                            document.getElementById("freeTextSubtypes_" + entity).style.display = "none";
+                            document.getElementById("freeTextSubtypes_" + entity).selectedIndex = 0;
+                            document.getElementById("categoricalTextSubtypes_" + entity).style.display = "none";
+                            document.getElementById("categoricalTextSubtypes_" + entity).selectedIndex = 0;
+
+                            document.getElementById("numericSubtypes_" + entity).style.display = "block";
+                        } else if (type === 'Free Text') {
+                            document.getElementById("numericSubtypes_" + entity).style.display = "none";
+                            document.getElementById("numericSubtypes_" + entity).selectedIndex = 0;
+                            document.getElementById("categoricalTextSubtypes_" + entity).style.display = "none";
+                            document.getElementById("categoricalTextSubtypes_" + entity).selectedIndex = 0;
+
+                            document.getElementById("freeTextSubtypes_" + entity).style.display = "block";
+                        } else if (type === 'Categorical Text') {
+                            document.getElementById("numericSubtypes_" + entity).style.display = "none";
+                            document.getElementById("numericSubtypes_" + entity).selectedIndex = 0;
+                            document.getElementById("freeTextSubtypes_" + entity).style.display = "none";
+                            document.getElementById("freeTextSubtypes_" + entity).selectedIndex = 0;
+
+                            document.getElementById("categoricalTextSubtypes_" + entity).style.display = "block";
+                        } else {
+                            document.getElementById("numericSubtypes_" + entity).style.display = "none";
+                            document.getElementById("freeTextSubtypes_" + entity).style.display = "none";
+                            document.getElementById("categoricalTextSubtypes_" + entity).style.display = "none";
+                            document.getElementById("numericSubtypes_" + entity).selectedIndex = 0;
+                            document.getElementById("freeTextSubtypes_" + entity).selectedIndex = 0;
+                            document.getElementById("categoricalTextSubtypes_" + entity).selectedIndex = 0;
+                        }
+                    }
+                </script>
+
+            </div>
+        </div>
+    </div>
+
+
+    <div th:if="!${catalogConfigurationEnabled}">
+
+        <h3>Item Entities Overview</h3>
+
+        <div th:if="not ${entitiesFieldsMap.isEmpty()}">
+
+            <div th:each="entry : ${entitiesFieldsMap}">
+
+                <hr style="height:5px; visibility:hidden;">
+                <hr style="border: 2px solid">
+                <hr style="height:5px; visibility:hidden;">
+
+                <p>Available attributes for entity: <span class="fbh badge" style="color:white; font-size: 15px;"><strong th:text="${entry.key}"></strong></span></p>
+
+                <div class="row">
+                    <div class="col-md-4 text-center">
+                        <h4>Field Name</h4>
+                    </div>
+                    <div class="col-md-1 text-center">
+                    </div>
+                    <div class="col-md-3 text-center">
+                        <h4>Field Type</h4>
+                    </div>
+                    <div class="col-md-1 text-center">
+                    </div>
+                    <div class="col-md-3">
+                        <h4>Field Subtype</h4>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-4 text-center">
+                        <span><h4><span class="badge fb"><label>id</label></span></h4></span>
+                    </div>
+                    <div class="col-md-1 text-center">
+                        <i class="bi bi-arrow-right"></i>
+                    </div>
+                    <div class="col-md-3 text-center">
+                        <span><h4><span class="badge eth" style="color: black;"><label>Categorical Text</label></span></h4></span>
+
+                    </div>
+                    <div class="col-md-1 text-center">
+                        <i class="bi bi-arrow-right"></i>
+                    </div>
+                    <div class="col-md-3">
+                        <span><h4><span class="badge subt1"><label>Single Value</label></span></h4></span>
+                    </div>
+                </div>
+
+                <div class="row" th:each="f: ${entry.value}">
+                    <div class="col-md-4 text-center">
+                        <h4>
+                                <span class="badge fb">
+                                    <label th:text="${f.name}"></label>
+                                </span>
+                        </h4>
+                    </div>
+                    <div class="col-md-1 text-center">
+                        <i class="bi bi-arrow-right"></i>
+                    </div>
+                    <div class="col-md-3 text-center">
+                        <h4>
+                                <span class="badge" style="color: black"
+                                      th:classappend="${(f.type == 'Categorical Text' ? 'eth': '') + (f.type == 'Free Text' ? 'syh' : '')+ (f.type == 'Numeric' ? 'gch' : '')}"
+                                      th:title="${f.type == 'Date'} ? 'If you do not include time in the date, it will be automatically set to midnight.'">
+                                    <label th:text="${f.type}"></label>
+                                    <i th:if="${f.type == 'Date'}" class="bi bi-info-circle"></i>
+                                </span>
+                        </h4>
+                    </div>
+                    <div class="col-md-1 text-center">
+                        <i class="bi bi-arrow-right"></i>
+                    </div>
+                    <div class="col-md-3">
+                        <h4>
+                                <span th:if="${f.subtype != null}"
+                                      th:classappend="${(f.subtype == 'Single Value' or f.subtype == 'English' or f.subtype == 'Integer' ? 'subt1': 'subt2')}"
+                                      class="badge">
+                                    <label th:text="${f.subtype}"></label>
+                                </span>
+                        </h4>
+                    </div>
+                </div>
+
+                <!--
+                <div class="table-responsive-md">
+                <table class="table">
+                    <thead class="table-secondary">
+                    <tr>
+                        <th scope="col" class="text-end">Field Name</th>
+                        <th scope="col" class="text-center">Field Type</th>
+                        <th scope="col">Field Subtype</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr>
+                        <td class="text-end"><h4><span class="badge fb"><label>id</label></span></h4></td>
+                        <td class="text-center"><h4><span class="badge eth" style="color: black;"><label>Categorical Text</label></span></h4></td>
+                        <td><h4><span class="badge subt1"><label>Single Value</label></span></h4></td>
+                    </tr>
+                    <tr th:each="f: ${entry.value}">
+                        <td class="text-end">
+                            <h4>
+                                <span class="badge fb">
+                                    <label th:text="${f.name}"></label>
+                                </span>
+                            </h4>
+                        </td>
+                        <td class="text-center">
+                            <h4>
+                                <span class="badge" style="color: black"
+                                      th:classappend="${(f.type == 'Categorical Text' ? 'eth': '') + (f.type == 'Free Text' ? 'syh' : '')+ (f.type == 'Numeric' ? 'gch' : '')}"
+                                      th:title="${f.type == 'Date'} ? 'If you do not include time in the date, it will be automatically set to midnight.'">
+                                    <label th:text="${f.type}"></label>
+                                    <i th:if="${f.type == 'Date'}" class="bi bi-info-circle"></i>
+                                </span>
+                            </h4>
+                        </td>
+                        <td>
+                            <h4>
+                                <span th:if="${f.subtype != null}"
+                                      th:classappend="${(f.subtype == 'Single Value' or f.subtype == 'English' or f.subtype == 'Integer' ? 'subt1': 'subt2')}"
+                                      class="badge">
+                                    <label th:text="${f.subtype}"></label>
+                                </span>
+                            </h4>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+                </div>
+                 -->
+            </div>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

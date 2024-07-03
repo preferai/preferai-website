@@ -1,0 +1,446 @@
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org"
+>
+<head>
+</head>
+<body>
+<div th:fragment="api-reference">
+
+    <br>
+    <div class="container">
+        <h2>
+            <label>API Reference</label>
+        </h2>
+        <br>
+
+        <label>This section lists all the available API endpoints, that allow you to manage item catalog, users, their interactions and get recommendations.</label>
+        <br><br>
+
+        <ul>
+            <li>Version: <span class="lead"><span class="badge bg-warning text-dark" style="opacity: .75">1.0.0</span></span></li>
+            <li>Hostname: <span class="lead"><span class="badge bg-warning text-dark" style="opacity: .75">app.uptrendz.ai</span></span></li>
+            <li>API consumes: <span class="lead"><span class="badge bg-warning text-dark" style="opacity: .75">application/json</span></span></li>
+            <li>API produces: <span class="lead"><span class="badge bg-warning text-dark" style="opacity: .75">application/json</span></span></li>
+            <li>Authentication: <span class="lead"><span class="badge bg-warning text-dark" style="opacity: .75">API Key</span></span></li>
+        </ul>
+
+        <br>
+        <br>
+        <h3>Data Ingestion</h3>
+        <br>
+
+        <label>
+            The following methods allow you to maintain the set of items, interactions and users in the data catalog.<br>
+            The items and users are specified using their ids, which are unique string identifiers matching <b>^[a-zA-Z0-9_-:@.]+$</b>, i.e. they may consist of digits, latin letters, underscores, colons, minus signs, at sign and dot.
+        </label>
+        <br>
+        <br>
+
+        <div>
+            <div class="card text-dark gch mb-3">
+                <div class="card-body">
+                    <h4 class="card-title fb">Items</h4>
+
+                    <div class="accordion accordion-flush" id="accordionFlushItems" style="margin-top: 5px; margin-bottom: 5px;">
+                        <div class="accordion-item">
+                            <h2 class="accordion-header" id="flush-headingItems">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#flush-collapseItems" aria-expanded="false" aria-controls="flush-collapseItems">
+                                    <span class="badge bg-success">POST</span>
+                                    <label style="padding-left: 10px">/items/{entity}</label>
+                                </button>
+                            </h2>
+                            <div id="flush-collapseItems" class="accordion-collapse collapse" aria-labelledby="flush-headingItems" data-bs-parent="#accordionFlushItems">
+                                <div class="accordion-body">
+                                    <label>
+                                        Adds a list of items for a given <b>entity</b>.<br><br>
+                                        Allowed parameters of the json object representing an item need to be predefined in the Data Catalog view.<br>
+                                        This POST call can also be used for <b>updating</b> existing items. In order to update items, just send the updated one with the same <b>id</b> values as before.<br><br>
+                                        <b>Required</b> parameters for this REST API call are:<br><br>
+
+                                        <table class="table" style="border-collapse: separate; -webkit-border-horizontal-spacing: 10px;">
+                                            <tr>
+                                                <th scope="col">Parameter</th>
+                                                <th scope="col">Description</th>
+                                            </tr>
+                                            <tr>
+                                                <td><b>entity</b></td>
+                                                <td>Name of the entity which json objects are being stored (each representing an item)</td>
+                                            </tr>
+                                            <tr>
+                                                <td><b>x-api-key</b></td>
+                                                <td>API key which needs to be included as the header parameter (value presented in the Data Catalog view)</td>
+                                            </tr>
+                                            <tr>
+                                                <td><b>x-domain-id</b></td>
+                                                <td>Domain id which needs to be included as the header parameter (value presented in the Data Catalog view)</td>
+                                            </tr>
+                                        </table>
+                                    </label>
+                                    <br><br>
+
+                                    <label>There are <b>NO optional parameters</b> available.</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <br>
+                    <h4 class="card-title fb">Interactions</h4>
+
+                    <div class="accordion accordion-flush" id="accordionFlushInteractions">
+                        <div class="accordion-item">
+                            <h2 class="accordion-header" id="flush-headingInteractions">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#flush-collapseInteractions" aria-expanded="false" aria-controls="flush-collapseInteractions">
+                                    <span class="badge bg-success">POST</span>
+                                    <label style="padding-left: 10px">/interactions</label>
+                                </button>
+                            </h2>
+                            <div id="flush-collapseInteractions" class="accordion-collapse collapse" aria-labelledby="flush-headingInteractions" data-bs-parent="#accordionFlushInteractions">
+                                <div class="accordion-body">
+                                    <label>
+                                        Adds a list of interactions.<br><br>
+                                        Allowed parameters of the json object representing an interaction need to be predefined in the Data Catalog view.<br>
+                                        If no timestamp was configured for interactions in the Data Catalog view, timestamp of the moment when the interaction json object has been pushed will be stored.
+                                        The same will be applied if the timestamp was configured in the Data Catalog view, but was not included as parameter of the interaction json object.<br><br>
+                                        <b>Required</b> parameters for this REST API call are:<br><br>
+
+                                        <table class="table" style="border-collapse: separate; -webkit-border-horizontal-spacing: 10px;">
+                                            <tr>
+                                                <th scope="col">Parameter</th>
+                                                <th scope="col">Description</th>
+                                            </tr>
+                                            <tr>
+                                                <td><b>x-api-key</b></td>
+                                                <td>API key which needs to be included as the header parameter (value presented in the Data Catalog view)</td>
+                                            </tr>
+                                            <tr>
+                                                <td><b>x-domain-id</b></td>
+                                                <td>Domain id which needs to be included as the header parameter (value presented in the Data Catalog view)</td>
+                                            </tr>
+                                        </table>
+                                    </label>
+                                    <br><br>
+
+                                    <label>There are <b>NO optional parameters</b> available.</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <br>
+                    <h4 class="card-title fb">Users</h4>
+
+                    <div class="accordion accordion-flush" id="accordionFlushUsers">
+                        <div class="accordion-item">
+                            <h2 class="accordion-header" id="flush-headingUsers">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#flush-collapseUsers" aria-expanded="false" aria-controls="flush-collapseUsers">
+                                    <span class="badge bg-success">POST</span>
+                                    <label style="padding-left: 10px">/users/{entity}</label>
+                                </button>
+                            </h2>
+                            <div id="flush-collapseUsers" class="accordion-collapse collapse" aria-labelledby="flush-headingUsers" data-bs-parent="#accordionFlushUsers">
+                                <div class="accordion-body">
+                                    <label>
+                                        Adds a list of users for a given <b>entity</b>.<br><br>
+                                        Allowed parameters of the json object representing a user need to be predefined in the Data Catalog view.<br>
+                                        This POST call can also be used for <b>updating</b> existing users. In order to update users, just send the updated one with the same <b>id</b> values as before.<br><br>
+                                        <b>Required</b> parameters for this REST API call are:<br><br>
+
+                                        <table class="table" style="border-collapse: separate; -webkit-border-horizontal-spacing: 10px;">
+                                            <tr>
+                                                <th scope="col">Parameter</th>
+                                                <th scope="col">Description</th>
+                                            </tr>
+                                            <tr>
+                                                <td><b>entity</b></td>
+                                                <td>Name of the entity which json objects are being stored (each representing a user)</td>
+                                            </tr>
+                                            <tr>
+                                                <td><b>x-api-key</b></td>
+                                                <td>API key which needs to be included as the header parameter (value presented in the Data Catalog view)</td>
+                                            </tr>
+                                            <tr>
+                                                <td><b>x-domain-id</b></td>
+                                                <td>Domain id which needs to be included as the header parameter (value presented in the Data Catalog view)</td>
+                                            </tr>
+                                        </table>
+                                    </label>
+                                    <br><br>
+
+                                    <label>There are <b>NO optional parameters</b> available.</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <br>
+        <h4>Responses</h4>
+        <br>
+
+        <div>
+            <div class="card text-dark gch mb-3">
+                <div class="card-body">
+                    <table class="table" style="border-collapse: separate; -webkit-border-horizontal-spacing: 10px;">
+                        <tr>
+                            <th scope="col">Response</th>
+                            <th scope="col">Description</th>
+                        </tr>
+                        <tr>
+                            <td><span class="lead"><span class="badge bg-warning text-dark" style="opacity: .75">200</span></span></td>
+                            <td>Successful operation.</td>
+                        </tr>
+                        <tr>
+                            <td><span class="lead"><span class="badge bg-warning text-dark" style="opacity: .75">400</span></span></td>
+                            <td>Invalid or missing required parameter (e.g. domain id is missing or invalid in the header parameter).</td>
+                        </tr>
+                        <tr>
+                            <td><span class="lead"><span class="badge bg-warning text-dark" style="opacity: .75">403</span></span></td>
+                            <td>Invalid or missing authentication details (e.g. API key is missing or invalid in the header parameter).</td>
+                        </tr>
+                        <tr>
+                            <td><span class="lead"><span class="badge bg-warning text-dark" style="opacity: .75">404</span></span></td>
+                            <td>Invalid URL.</td>
+                        </tr>
+                        <tr>
+                            <td><span class="lead"><span class="badge bg-warning text-dark" style="opacity: .75">405</span></span></td>
+                            <td>Invalid HTTP method.</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <br>
+        <br>
+        <h3>Service Provider</h3>
+        <br>
+
+        <label>
+            Recommender is capable of recommending items (Recommend items to user, Recommend items to item) or users (Recommend users to item, Recommend users to user) depending on the configuration of the recommendation scenarios.</label>
+        <br>
+        <br>
+
+        <div>
+            <div class="card text-dark gch mb-3">
+                <div class="card-body">
+                    <h4 class="card-title fb">Recommendations</h4>
+
+                    <div class="accordion accordion-flush" id="accordionFlushRecommGet" style="margin-top: 5px; margin-bottom: 5px;">
+                        <div class="accordion-item">
+                            <h2 class="accordion-header" id="flush-headingRecommGet">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#flush-collapseRecommGet" aria-expanded="false" aria-controls="flush-collapseRecommGet">
+                                    <label style="padding-left: 3px"></label>
+                                    <span class="badge bg-primary">GET</span>
+                                    <label style="padding-left: 15px">/recomm</label>
+                                </button>
+                            </h2>
+                            <div id="flush-collapseRecommGet" class="accordion-collapse collapse" aria-labelledby="flush-headingRecommGet" data-bs-parent="#accordionFlushRecommGet">
+                                <div class="accordion-body">
+                                    <label>
+                                        Retrieves a list of recommendations for a given set of parameters (e.g. items or users).<br><br>
+
+                                        <b>Required</b> parameters for this REST API call are:<br><br>
+
+                                        <table class="table" style="border-collapse: separate; -webkit-border-horizontal-spacing: 10px;">
+                                            <tr>
+                                                <th scope="col">Parameter</th>
+                                                <th scope="col">Description</th>
+                                            </tr>
+                                            <tr>
+                                                <td><b>scenarioId</b></td>
+                                                <td>Scenario id which is being used to retrieve desired recommendations</td>
+                                            </tr>
+                                            <tr>
+                                                <td><b>userId</b></td>
+                                                <td>User id for which the recommendations are being retrieved</td>
+                                            </tr>
+                                            <tr>
+                                                <td><b>x-api-key</b></td>
+                                                <td>API key which needs to be included as the header parameter (value presented in the Data Catalog view)</td>
+                                            </tr>
+                                            <tr>
+                                                <td><b>x-domain-id</b></td>
+                                                <td>Domain id which needs to be included as the header parameter (value presented in the Data Catalog view)</td>
+                                            </tr>
+                                        </table>
+                                    </label>
+                                    <br><br>
+
+                                    <label>
+                                        <b>Optional</b> parameters:<br><br>
+
+                                        <table class="table" style="border-collapse: separate; -webkit-border-horizontal-spacing: 10px;">
+                                            <tr>
+                                                <th scope="col">Parameter</th>
+                                                <th scope="col">Description</th>
+                                            </tr>
+                                            <tr>
+                                                <td><b>count</b></td>
+                                                <td>Number of recommendations to be retrieved (10 retrieved by default if no value submitted)</td>
+                                            </tr>
+                                            <tr>
+                                                <td><b>itemId</b></td>
+                                                <td>If provided, this context item id will be used to find similar ones based on the configurations from submitted scenario id</td>
+                                            </tr>
+                                        </table>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="accordion accordion-flush" id="accordionFlushRecommPost">
+                        <div class="accordion-item">
+                            <h2 class="accordion-header" id="flush-headingRecommPost">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#flush-collapseRecommPost" aria-expanded="false" aria-controls="flush-collapseRecommPost">
+                                    <span class="badge bg-success">POST</span>
+                                    <label style="padding-left: 10px">/recomm</label>
+                                </button>
+                            </h2>
+                            <div id="flush-collapseRecommPost" class="accordion-collapse collapse" aria-labelledby="flush-headingRecommPost" data-bs-parent="#accordionFlushRecommPost">
+                                <div class="accordion-body">
+                                    <label>
+                                        Retrieves a list of recommendations for a given set of parameters (e.g. items or users).<br>
+                                        In addition to homonymous GET REST API call, this one offers a possibility to apply <b>filters</b> on recommendation results through json body parameter called <b>"resultFilter"</b>.<br><br>
+
+                                        <b>Required</b> parameters for this REST API call are:<br><br>
+
+                                        <table class="table" style="border-collapse: separate; -webkit-border-horizontal-spacing: 10px;">
+                                            <tr>
+                                                <th scope="col">Parameter</th>
+                                                <th scope="col">Description</th>
+                                            </tr>
+                                            <tr>
+                                                <td><b>scenarioId</b></td>
+                                                <td>Scenario id which is being used to retrieve desired recommendations</td>
+                                            </tr>
+                                            <tr>
+                                                <td><b>userId</b></td>
+                                                <td>
+                                                    User id for which the recommendations are being retrieved.<br>
+                                                    Depending on your domain's configuration, you would use this parameter if you have chosen only "registered" users as the type of users you have on your platform. In case you have chosen both types, both userId & sessionId are allowed to be submitted but in that particular case userId will be used to produce recommendations.
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td><b>sessionId</b></td>
+                                                <td>
+                                                    Session id for which the recommendations are being retrieved.<br>
+                                                    Depending on your domain's configuration, you would use this parameter if you have chosen only "anonymous" users as the type of users you have on your platform. In case you have chosen both types, both userId & sessionId are allowed to be submitted but in that particular case userId will be used to produce recommendations.
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td><b>x-api-key</b></td>
+                                                <td>API key which needs to be included as the header parameter (value presented in the Data Catalog view)</td>
+                                            </tr>
+                                            <tr>
+                                                <td><b>x-domain-id</b></td>
+                                                <td>Domain id which needs to be included as the header parameter (value presented in the Data Catalog view)</td>
+                                            </tr>
+                                        </table>
+                                    </label>
+                                    <br><br>
+
+                                    <label>
+                                        <b>Optional</b> parameters:<br><br>
+
+                                        <table class="table" style="border-collapse: separate; -webkit-border-horizontal-spacing: 10px;">
+                                            <tr>
+                                                <th scope="col">Parameter</th>
+                                                <th scope="col">Description</th>
+                                            </tr>
+                                            <tr>
+                                                <td><b>count</b></td>
+                                                <td>Number of recommendations to be retrieved (10 retrieved by default if no value submitted)</td>
+                                            </tr>
+                                            <tr>
+                                                <td><b>recoSettings</b></td>
+                                                <td>
+                                                    Json <b>body</b> object used for recommendation settings such as (1) setting a <i>context</i> for the recommender (e.g. providing item id(s) which user is currently interacting with in order to recommend similar ones) and (2) providing a <i>result filtering</i> (e.g., to exclude or include items with specific values):<br><br>
+
+                                                    <div class="card text-dark bg-light mb-3">
+                                                        <div class="card-body">
+                                                            <pre style="white-space: pre-line; line-height: 1.5em; margin: 0;">
+                                                                {
+                                                                &nbsp;&nbsp;"itemIds": [
+                                                                &nbsp;&nbsp;&nbsp;&nbsp;"some-item-id"
+                                                                &nbsp;&nbsp;],
+                                                                &nbsp;&nbsp;"resultFilter": [
+                                                                &nbsp;&nbsp;&nbsp;&nbsp;{
+                                                                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"contains": false,
+                                                                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"fieldName": "id",
+                                                                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"fieldValues": [
+                                                                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"string"
+                                                                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;]
+                                                                &nbsp;&nbsp;&nbsp;&nbsp;}
+                                                                &nbsp;&nbsp;]
+                                                                }
+                                                            </pre>
+                                                        </div>
+                                                    </div>
+                                                    <br>
+
+                                                    <label>
+                                                        This json object represents a body of the POST REST API call.<br><br>
+
+                                                        <b><i>itemIds</i></b><br>
+                                                        Some recommender algorithms take into account context items. For example, if a user opens a detail page of a product you can provide its id to recommender in order to find products with similar characteristics.
+                                                        You have the option to submit not only 1 item id as contextual parameter, but a list of them.<br><br>
+
+                                                        <b><i>resultFilter</i></b><br>
+                                                        With this part of the json body object you can define if recommendation result <b>must not include</b> items with id equal to "string" for example (e.g. <code>"contains": false</code>).<br>
+                                                        Opposite observation can be made in case of desired inclusion for certain parameter values of recommended items (e.g. <code>"contains": true</code>).<br>
+                                                        Then the desired <code>fieldName</code> with related <code>fieldValues</code> will indicate that items <b>only with these field values must be present</b> in the recommendation result.
+                                                    </label>
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <br>
+        <h4>Responses</h4>
+        <br>
+
+        <div>
+            <div class="card text-dark gch mb-3">
+                <div class="card-body">
+                    <table class="table" style="border-collapse: separate; -webkit-border-horizontal-spacing: 10px;">
+                        <tr>
+                            <th scope="col">Response</th>
+                            <th scope="col">Description</th>
+                        </tr>
+                        <tr>
+                            <td><span class="lead"><span class="badge bg-warning text-dark" style="opacity: .75">200</span></span></td>
+                            <td>Successful operation.</td>
+                        </tr>
+                        <tr>
+                            <td><span class="lead"><span class="badge bg-warning text-dark" style="opacity: .75">400</span></span></td>
+                            <td>Invalid or missing required parameter (e.g. domain id is missing or invalid in the header parameter).</td>
+                        </tr>
+                        <tr>
+                            <td><span class="lead"><span class="badge bg-warning text-dark" style="opacity: .75">403</span></span></td>
+                            <td>Invalid or missing authentication details (e.g. API key is missing or invalid in the header parameter).</td>
+                        </tr>
+                        <tr>
+                            <td><span class="lead"><span class="badge bg-warning text-dark" style="opacity: .75">404</span></span></td>
+                            <td>Invalid URL.</td>
+                        </tr>
+                        <tr>
+                            <td><span class="lead"><span class="badge bg-warning text-dark" style="opacity: .75">405</span></span></td>
+                            <td>Invalid HTTP method.</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

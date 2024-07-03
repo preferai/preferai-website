@@ -1,0 +1,2525 @@
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head>
+</head>
+<body>
+<div th:fragment="custom">
+
+    <br>
+
+    <form action="#" th:action="@{/saveChanges(domain=${domain},scenarioName=${scenarioName})}" method="POST">
+        <h3>
+            Custom Scenario
+
+            <input th:unless="${scenarioDeployed}" type="submit" name="action" class="btn sbtn" value="Save">
+        </h3>
+
+        <div th:if="${scenarioInvalidConfiguration != null}" class="alert alert-warning alert-dismissible fade show" role="alert">
+            <strong><i class="bi bi-exclamation-triangle-fill"></i> Warning!</strong> <label th:text="${scenarioInvalidConfiguration}"></label>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+
+        <div th:if="${itemContextError}" id="itemContextError" class="alert alert-danger alert-dismissible fade show" role="alert">
+            <strong><i class="bi bi-exclamation-triangle-fill"></i> Error!</strong> Item context enabled, but no entity has been selected.
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+
+        <div th:if="${hybridInputError}" id="hybridInputError" class="alert alert-danger alert-dismissible fade show" role="alert">
+            <strong><i class="bi bi-exclamation-triangle-fill"></i> Error!</strong><br>Invalid input values. Please check if you submitted valid values for all the settings and try again.
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+
+        <div id="noInteractionTypesWarning" class="alert alert-warning alert-dismissible fade show" role="alert" hidden>
+            <strong><i class="bi bi-exclamation-triangle-fill"></i> Warning!</strong><br>No interaction type has been defined.<br>Please visit data catalog and add some interaction types in order to use and configure selected algorithm.
+            <button type="button" class="btn-close" aria-label="Close" onclick="document.getElementById('noInteractionTypesWarning').hidden = true;"></button>
+        </div>
+        <div id="noFreeTextFieldsWarning" class="alert alert-warning alert-dismissible fade show" role="alert" hidden>
+            <strong><i class="bi bi-exclamation-triangle-fill"></i> Warning!</strong><br>No FREE TEXT fields have been defined for observed entity.<br>Please visit data catalog and add some in order to use and configure selected algorithm.
+            <button type="button" class="btn-close" aria-label="Close" onclick="document.getElementById('noFreeTextFieldsWarning').hidden = true;"></button>
+        </div>
+        <div id="noCbRefScenarioWarning" class="alert alert-warning alert-dismissible fade show" role="alert" hidden>
+            <strong><i class="bi bi-exclamation-triangle-fill"></i> Warning!</strong><br>There is no CB recommendation profile defined that could be used as the reference profile.<br>Please create the CB recommendation scenario first in order to configure selected algorithm.
+            <button type="button" class="btn-close" aria-label="Close" onclick="document.getElementById('noCbRefScenarioWarning').hidden = true;"></button>
+        </div>
+        <div id="noRefScenarioWarning" class="alert alert-warning alert-dismissible fade show" role="alert" hidden>
+            <strong><i class="bi bi-exclamation-triangle-fill"></i> Warning!</strong><br>There aren't enough recommendation scenarios defined that could be used as reference profiles for chosen options.<br>Please create at least 2 recommendation scenarios in order to properly configure the hybrid algorithm.
+            <button type="button" class="btn-close" aria-label="Close" onclick="document.getElementById('noRefScenarioWarning').hidden = true;"></button>
+        </div>
+
+        <div th:if="${userHistoryInteractionsCountError}" class="alert alert-danger alert-dismissible fade show" role="alert">
+            <strong><i class="bi bi-exclamation-triangle-fill"></i> Error!</strong> Submitted value for interactions count in user history section must be an integer!
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+
+        <div th:if="${mltPropertiesValueError}" class="alert alert-danger alert-dismissible fade show" role="alert">
+            <strong><i class="bi bi-exclamation-triangle-fill"></i> Error!</strong> MLT property values must be integer values.
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        <div th:if="${userCbCfPropertiesValueError}" class="alert alert-danger alert-dismissible fade show" role="alert">
+            <strong><i class="bi bi-exclamation-triangle-fill"></i> Error!</strong>'Recent day count' & 'Similar items count' must be integer values.
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        <div th:if="${missingCbRefProfile}" class="alert alert-danger alert-dismissible fade show" role="alert">
+            <strong><i class="bi bi-exclamation-triangle-fill"></i> Error!</strong> CB reference profile has not been selected.
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        <div th:if="${missingBoosterAttribute}" class="alert alert-danger alert-dismissible fade show" role="alert">
+            <strong><i class="bi bi-exclamation-triangle-fill"></i> Error!</strong> Booster field has not been selected.
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        <div th:if="${missingBoosterValue}" class="alert alert-danger alert-dismissible fade show" role="alert">
+            <strong><i class="bi bi-exclamation-triangle-fill"></i> Error!</strong> Booster field value must not be empty.
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        <div th:if="${boosterValueWrongType}" class="alert alert-danger alert-dismissible fade show" role="alert">
+            <strong><i class="bi bi-exclamation-triangle-fill"></i> Error!</strong> Booster field value must be numeric.
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        <div th:if="${boosterExists}" class="alert alert-danger alert-dismissible fade show" role="alert">
+            <strong><i class="bi bi-exclamation-triangle-fill"></i> Error!</strong> Booster field already exists. Please delete the existing one first and then add the new one.
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+
+        <div th:if="${remindersError}" class="alert alert-danger alert-dismissible fade show" role="alert">
+            <strong><i class="bi bi-exclamation-triangle-fill"></i> Error!</strong> Reminders enabled but no interaction type selected. Please select at least 1 interaction type if reminders are enabled.
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+
+        <div th:if="${missingBusinessRuleAttribute}" class="alert alert-danger alert-dismissible fade show" role="alert">
+            <strong><i class="bi bi-exclamation-triangle-fill"></i> Error!</strong> Attribute has not been selected.
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        <div th:if="${missingBusinessRuleValue}" class="alert alert-danger alert-dismissible fade show" role="alert">
+            <strong><i class="bi bi-exclamation-triangle-fill"></i> Error!</strong> Attribute expected value must not be empty.
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        <div th:if="${businessRuleWrongType}" class="alert alert-danger alert-dismissible fade show" role="alert">
+            <strong><i class="bi bi-exclamation-triangle-fill"></i> Error!</strong> Wrong value type submitted for chosen attribute.
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        <div th:if="${ruleExists}" class="alert alert-danger alert-dismissible fade show" role="alert">
+            <strong><i class="bi bi-exclamation-triangle-fill"></i> Error!</strong> Business rule with submitted field exists already. Please delete the existing rule first and then add the new one.
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+
+
+        <hr style="height:5px; visibility:hidden;">
+        <h4>General Settings</h4>
+        <hr style="border: 2px solid">
+
+
+        <div class="container">
+            <div class="row justify-content-start">
+                <div class="col-md-4">
+                    <label>Scenario name</label>
+                    <input type="text" class="form-control float-end" name="scenarioNewName" th:value="${scenarioName}"
+                           onkeyup="presentScenarioId(this.value)">
+                </div>
+
+                <div class="col-md-4 offset-md-1">
+                    <br>
+                    <label>Scenario ID:</label>
+                    <span id="scenarioIdDynamicSpan" th:text="${scenarioId}" style="font-weight: bold"></span>
+                </div>
+            </div>
+        </div>
+
+        <br>
+        <div class="container">
+            <div class="row justify-content-start">
+                <div class="col-md-4">
+                    <label>What will be recommended?</label>
+
+                    <select id="recoOptionSelect" name="recoOption" class="form-select"
+                            onchange="resetScenarioWarningModal(this);
+                                      updatePossibleRecoModels(this);
+                                      updateConsiderationOfConsumedItems(this);
+                                      updateFilterQuery(this);
+                                      updateItemContextAppearance(null);
+                                      updateScenarioSettingsAppearance();">
+                        <option value="" th:selected="${recoOption == null}" disabled hidden>Choose Entity</option>
+                        <optgroup label="Items" th:if="${not #lists.isEmpty(itemsEntities)}">
+                            <option th:each="entry : ${itemsEntities}"
+                                    th:value="'items;' + ${entry}"
+                                    th:text="${entry}"
+                                    th:selected="${recoOption == 'items;' + entry}"></option>
+                        </optgroup>
+                        <optgroup label="Users" th:if="${not #lists.isEmpty(usersEntities)}">
+                            <option th:each="entry : ${usersEntities}"
+                                    th:value="'users;' + ${entry}"
+                                    th:text="${entry}"
+                                    th:selected="${recoOption == 'users;' + entry}"></option>
+                        </optgroup>
+                    </select>
+
+                    <br>
+                    <label>Who is going to get the recommendation?</label>
+
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="userType" value="anonymous" id="anonymous"
+                               th:disabled="${configuredUserType == 'registered'}"
+                               th:checked="${(selectedUserType == 'anonymous') || (selectedUserType == null && configuredUserType == 'anonymous')}">
+                        <label class="form-check-label" for="anonymous">
+                            Anonymous User
+                        </label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="userType" value="registered" id="registered"
+                               th:disabled="${configuredUserType == 'anonymous'}"
+                               th:checked="${(selectedUserType == 'registered') || (selectedUserType == null && configuredUserType != 'anonymous')}">
+                        <label class="form-check-label" for="registered">
+                            Registered User
+                        </label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="userType" value="both" id="both"
+                               th:disabled="${configuredUserType != 'both'}"
+                               th:checked="${(selectedUserType == 'both')}">
+                        <label class="form-check-label" for="both">
+                            Anonymous & Registered Users
+                        </label>
+                    </div>
+                </div>
+
+                <div class="col-md-4 offset-md-1">
+
+                    <label>Recommendation Model</label>
+
+                    <!-- placeholder -->
+                    <select id="placeholder" name="recoModel" class="form-select" disabled>
+                        <option value="" selected disabled hidden>Choose Model</option>
+                    </select>
+
+                    <!-- itemsAlgos -->
+                    <select id="itemsAlgos" name="recoModel" class="form-select" style="display: none"
+                            onchange="resetScenarioWarningModal(this);
+                                      updateItemContextAppearance(this.value);
+                                      updateMltBoostersAppearance();
+                                      updateModelSpecificSettings(this.value, true);">
+                        <option value="" th:selected="${recoModel == null}" disabled hidden>Choose Model</option>
+                        <option th:each="entry : ${itemsAlgos}"
+                                th:value="${entry}"
+                                th:text="${entry}"
+                                th:selected="${recoModel == entry}">
+                        </option>
+                    </select>
+
+                    <!-- usersAlgos -->
+                    <select id="usersAlgos" name="recoModel" class="form-select" style="display: none"
+                            onchange="resetScenarioWarningModal(this);
+                                      updateItemContextAppearance(this.value);
+                                      updateMltBoostersAppearance();
+                                      updateModelSpecificSettings(this.value, true);">
+                        <option value="" th:selected="${recoModel == null}" disabled hidden>Choose Model</option>
+                        <option th:each="entry : ${usersAlgos}"
+                                th:value="${entry}"
+                                th:text="${entry}"
+                                th:selected="${recoModel == entry}">
+                        </option>
+                    </select>
+
+                    <br>
+                    <div class="form-check form-switch">
+                        <input id="itemContextSwitch" name="itemContextSwitch" class="form-check-input" type="checkbox"
+                               onchange="updateItemContextDropdown();"
+                               th:attrappend="onclick=${(recoModel != null) && (recoModel == 'ContextInteractionCf' || recoModel == 'ItemCb' || recoModel == 'UserCbCf')} ? 'return false;'"
+                               th:checked="${itemContext != null}">
+                        <label class="form-check-label" for="itemContextSwitch">
+                            Item Context
+                            <i id="itemContextIconMandatory" class="bi bi-exclamation-triangle" hidden
+                               title="This is a mandatory setting for selected recommendation model."></i>
+                        </label>
+                    </div>
+
+                    <select id="itemContextSelect" name="itemContext" class="form-select"
+                            onchange="updateMltBoostersAppearance();"
+                            th:disabled="${itemContext == null}">
+                        <option value="" th:selected="${itemContext == null}" disabled hidden>Choose Context</option>
+                        <option th:each="entry : ${itemsEntities}"
+                                th:value="${entry}"
+                                th:text="${entry}"
+                                th:selected="${itemContext == entry}"></option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <div id="scenarioSettingsDiv" th:hidden="${recoObject == null || recoModel == null}">
+            <!-- User History -->
+            <div id="userHistoryDiv">
+                <hr style="height:5px; visibility:hidden;">
+                <h4>User History</h4>
+                <hr style="border: 2px solid">
+
+                <div class="container">
+                    <div class="row justify-content-start">
+                        <div class="col-md-6">
+                            <!-- interactionTypes -->
+                            <li style="display: inline-block">
+                                <div class="form-check form-switch">
+                                    <input id="selectAllInteractionTypesSwitch_userHistory" class="form-check-input" type="checkbox"
+                                           onchange="selectAll(this, 'userHistory')">
+                                    <label class="form-check-label" for="selectAllInteractionTypesSwitch_userHistory" style="">Select All</label>
+                                </div>
+                                <label style="margin-right: 10px">Use the following interaction types to fetch the interaction history of the user:</label>
+                            </li>
+
+                            <br>
+
+                            <div th:each="entry : ${interactionTypes}"
+                                 class="form-check form-check-inline" style="padding-left: 0; padding-top: 5px;">
+                                <input type="checkbox" class="btn-check" name="userHistoryInteractionTypes"
+                                       onclick="updateRelatedSelectAllSwitch(this);"
+                                       th:id="'interactionType_userHistory_' + ${entry.name}"
+                                       th:value="${entry.name}"
+                                       th:checked="${selectedUserHistoryInteractionTypes != null && #lists.contains(selectedUserHistoryInteractionTypes, entry.name)}">
+                                <label class="btn btn-outline-primary" th:for="'interactionType_userHistory_' + ${entry.name}" th:text="${entry.name}"></label>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <br>
+                            <table style="border-collapse: separate; -webkit-border-horizontal-spacing: 10px;">
+                                <tr>
+                                    <td>
+                                        <label>Fetch user history based on interactions core</label>
+                                        <i id="fetchUserHistoryBasedOnInteractionsCoreInfoIcon" class="bi bi-info-circle"></i>
+                                    </td>
+                                    <td>
+                                        <div class="form-check form-switch">
+                                            <input id="fetchFromInteractionsCoreSwitch" class="form-check-input" type="checkbox"
+                                                   name="fetchFromInteractionsCore"
+                                                   th:checked="${fetchFromInteractionsCore}"
+                                                   onchange="updateUserHistoryInteractionsCountInputAppearance(this.checked)">
+                                        </div>
+                                    </td>
+                                </tr>
+                            </table>
+
+                            <table id="userHistoryInteractionsCountInputTable" style="border-collapse: separate; -webkit-border-horizontal-spacing: 10px;">
+                                <tr>
+                                    <td><label>Number of interactions to consider for each selected interaction type:</label></td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <div class="col-md-3">
+                                            <input id="userHistoryInteractionsCountInput" type="text" class="form-control float-end" name="userHistoryInteractionsCount" placeholder="10" th:value="${userHistoryInteractionsCount}">
+                                        </div>
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <hr style="height:5px; visibility:hidden;">
+            <h4>Model Specific Settings</h4>
+            <hr style="border: 2px solid">
+
+            <!-- Model Specific Settings -->
+            <div class="container">
+                <!-- placeholder -->
+                <div id="modelSpecificSettingsPlaceholder" class="row justify-content-start">
+                    <br>
+                    <label>Please select a desired recommendation model in order to configure its settings.</label>
+                </div>
+
+                <!-- ItemMp -->
+                <div id="ItemMp" class="row justify-content-start" hidden>
+                    <!-- interactionTypes (count fields) -->
+                    <div class="col-md-5">
+                        <li style="display: inline-block">
+                            <div class="form-check form-switch">
+                                <input id="selectAllInteractionTypesSwitch_ItemMp" class="form-check-input" type="checkbox"
+                                       onchange="selectAll(this, 'ItemMp')">
+                                <label class="form-check-label" for="selectAllInteractionTypesSwitch_ItemMp" style="">Select All</label>
+                            </div>
+                            <label style="margin-right: 10px">Calculate popularity using the following interactions:</label>
+                        </li>
+
+                        <br>
+
+                        <div th:each="entry : ${interactionTypes}"
+                             class="form-check form-check-inline" style="padding-left: 0; padding-top: 5px;">
+                            <input type="checkbox" class="btn-check" name="interactionTypes"
+                                   onclick="updateRelatedSelectAllSwitch(this);"
+                                   th:id="'interactionType_ItemMp_' + ${entry.name}"
+                                   th:value="${entry.name}"
+                                   th:checked="${recoModel == 'ItemMp' && selectedInteractionTypesMap != null && #maps.containsKey(selectedInteractionTypesMap, entry.name)}">
+                            <label class="btn btn-outline-primary" th:for="'interactionType_ItemMp_' + ${entry.name}" th:text="${entry.name}"></label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ItemCb -->
+                <div id="ItemCb" class="row justify-content-start" hidden>
+                    <div class="col-md-4">
+                        <input id="boosterIdToDeleteInput_ItemCb" type="text" name="boosterIdToDelete" hidden disabled>
+                        <div th:if="${not #lists.isEmpty(mltBoosters)}" class="col-md-3">
+                            <table class="table" style="border-collapse: separate; -webkit-border-horizontal-spacing: 5px;">
+                                <tr>
+                                    <th scope="col">Field</th>
+                                    <th scope="col">Boost</th>
+                                    <th scope="col" th:hidden="${scenarioDeployed == true}"></th>
+                                </tr>
+                                <tr th:each="entry : ${mltBoosters}">
+                                    <td><label th:text="${entry.field}"></label></td>
+                                    <td><label th:text="${entry.boost}"></label></td>
+                                    <td th:hidden="${scenarioDeployed == true}" style="text-align: center; vertical-align: middle;">
+                                        <input class="btn btn-danger" type="submit" name="deleteBooster" value="Delete"
+                                               th:attr="onclick=|document.getElementById('boosterIdToDeleteInput_ItemCb').value = '${entry.id}'|">
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+                        <i th:if="${#lists.isEmpty(mltBoosters)}">
+                            Please <b>add at least 1 MLT booster field</b> in order to be able to configure the algorithm properly.
+                        </i>
+                    </div>
+
+                    <div class="col-md-7">
+
+                        <u><b>MLT Settings</b></u>
+                        <br>
+
+                        <!-- mltDashboardProperties -->
+                        <table style="border-collapse: separate; -webkit-border-horizontal-spacing: 10px;">
+                            <tr>
+                                <td><label>Max results per item</label></td>
+                                <td><input id="mltMaxResults_ItemCb" type="text" class="form-control float-end" name="mltMaxResults" placeholder="50" th:value="${mltMaxResults}" disabled></td>
+                            </tr>
+                            <tr>
+                                <td><label>Max number of query terms (maxqt)</label></td>
+                                <td><input id="maxqt_ItemCb" type="text" class="form-control float-end" name="mltMaxqt" placeholder="30" th:value="${mltMaxqt}" disabled></td>
+                            </tr>
+                            <tr>
+                                <td><label>Minimum document frequency (mindf)</label></td>
+                                <td><input id="mindf_ItemCb" type="text" class="form-control float-end" name="mltMindf" placeholder="2" th:value="${mltMindf}" disabled></td>
+                            </tr>
+                            <tr>
+                                <td><label>Minimum term frequency (mintf)</label></td>
+                                <td><input id="mintf_ItemCb" type="text" class="form-control float-end" name="mltMintf" placeholder="1" th:value="${mltMintf}" disabled></td>
+                            </tr>
+                            <tr>
+                                <td><label>Minimum word length (minwl)</label></td>
+                                <td><input id="minwl_ItemCb" type="text" class="form-control float-end" name="mltMinwl" placeholder="4" th:value="${mltMinwl}" disabled></td>
+                            </tr>
+                        </table>
+
+                        <div class="container">
+                            <div class="row align-items-start">
+                                <div class="col" style="padding-left: 0">
+                                    <div th:hidden="${scenarioDeployed == true}">
+                                        <br>
+                                        <u><b>MLT Boosters</b></u>
+                                        <br>
+
+                                        <!-- mltBossters -->
+                                        <table style="border-collapse: separate; -webkit-border-vertical-spacing: 5px;">
+                                            <tr>
+                                                <td style="padding-left: 10px"><label>Pick an attribute</label></td>
+                                            </tr>
+                                            <tr>
+                                                <td style="padding-left: 10px">
+                                                    <select id="itemsFreeTextAttributes_ItemCb" name="boostField" class="form-select"
+                                                            style="display: none"></select>
+                                                    <select id="usersFreeTextAttributes_ItemCb" name="boostField" class="form-select"
+                                                            style="display: none"></select>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td style="padding-left: 10px"><label>Boost value</label></td>
+                                            </tr>
+                                            <tr id="boostValue_ItemCb">
+                                                <td style="padding-left: 10px"><input id="boostValueInputField_ItemCb" type="text" class="form-control float-end" name="boostValue"></td>
+                                            </tr>
+                                            <tr>
+                                                <td><input class="btn btn-outline-success float-end" type="submit" name="addBooster" value="Add"></td>
+                                            </tr>
+                                        </table>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-7" style="padding-right: 100px">
+                                    <br>
+                                    <u><b>Result Strategy</b></u>
+                                    <i id="itemCbResultStrategyInfoIcon" class="bi bi-info-circle"></i>
+                                    <br>
+
+                                    <!-- Result Strategy -->
+                                    <table style="border-collapse: separate; -webkit-border-vertical-spacing: 5px;">
+                                        <tr>
+                                            <td style="padding-left: 10px"><label>Used for context items consumption:</label></td>
+                                        </tr>
+                                        <tr>
+                                            <td style="padding-left: 10px">
+                                                <select id="itemCbResultStrategySelect" name="resultStrategy" class="form-select" disabled
+                                                        onchange="updateItemCbResultStrategyInfoIcon(this.value)">
+                                                    <option th:each="entry : ${itemCbResultStrategies}"
+                                                            th:value="${entry}"
+                                                            th:text="${entry}"
+                                                            th:selected="${selectedResultStrategy == entry || (selectedResultStrategy == null && entry == 'roundRobinSkipItem')}"></option>
+                                                </select>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ItemHistoryCb -->
+                <div id="ItemHistoryCb" class="row justify-content-start" hidden>
+                    <div class="col-md-4">
+                        <input id="boosterIdToDeleteInput_ItemHistoryCb" type="text" name="boosterIdToDelete" hidden disabled>
+                        <div th:if="${not #lists.isEmpty(mltBoosters)}" class="col-md-3">
+                            <table class="table" style="border-collapse: separate; -webkit-border-horizontal-spacing: 5px;">
+                                <tr>
+                                    <th scope="col">Field</th>
+                                    <th scope="col">Boost</th>
+                                    <th scope="col" th:hidden="${scenarioDeployed == true}"></th>
+                                </tr>
+                                <tr th:each="entry : ${mltBoosters}">
+                                    <td><label th:text="${entry.field}"></label></td>
+                                    <td><label th:text="${entry.boost}"></label></td>
+                                    <td th:hidden="${scenarioDeployed == true}" style="text-align: center; vertical-align: middle;">
+                                        <input class="btn btn-danger" type="submit" name="deleteBooster" value="Delete"
+                                               th:attr="onclick=|document.getElementById('boosterIdToDeleteInput_ItemHistoryCb').value = '${entry.id}'|" >
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+                        <i th:if="${#lists.isEmpty(mltBoosters)}">
+                            Please <b>add at least 1 MLT booster field</b> in order to be able to configure the algorithm properly.
+                        </i>
+                    </div>
+
+                    <div class="col-md-7">
+
+                        <u><b>MLT Settings</b></u>
+                        <br>
+
+                        <!-- mltDashboardProperties -->
+                        <table style="border-collapse: separate; -webkit-border-horizontal-spacing: 10px;">
+                            <tr>
+                                <td><label>Max results per item</label></td>
+                                <td><input id="mltMaxResults_ItemHistoryCb" type="text" class="form-control float-end" name="mltMaxResults" placeholder="50" th:value="${mltMaxResults}" disabled></td>
+                            </tr>
+                            <tr>
+                                <td><label>Max number of query terms (maxqt)</label></td>
+                                <td><input id="maxqt_ItemHistoryCb" type="text" class="form-control float-end" name="mltMaxqt" placeholder="30" th:value="${mltMaxqt}" disabled></td>
+                            </tr>
+                            <tr>
+                                <td><label>Minimum document frequency (mindf)</label></td>
+                                <td><input id="mindf_ItemHistoryCb" type="text" class="form-control float-end" name="mltMindf" placeholder="2" th:value="${mltMindf}" disabled></td>
+                            </tr>
+                            <tr>
+                                <td><label>Minimum term frequency (mintf)</label></td>
+                                <td><input id="mintf_ItemHistoryCb" type="text" class="form-control float-end" name="mltMintf" placeholder="1" th:value="${mltMintf}" disabled></td>
+                            </tr>
+                            <tr>
+                                <td><label>Minimum word length (minwl)</label></td>
+                                <td><input id="minwl_ItemHistoryCb" type="text" class="form-control float-end" name="mltMinwl" placeholder="4" th:value="${mltMinwl}" disabled></td>
+                            </tr>
+                        </table>
+
+                        <div class="container">
+                            <div class="row align-items-start">
+                                <div class="col" style="padding-left: 0">
+                                    <div th:hidden="${scenarioDeployed == true}">
+                                        <br>
+                                        <u><b>MLT Boosters</b></u>
+                                        <br>
+
+                                        <!-- mltBossters -->
+                                        <table style="border-collapse: separate; -webkit-border-vertical-spacing: 5px;">
+                                            <tr>
+                                                <td style="padding-left: 10px"><label>Pick an attribute</label></td>
+                                            </tr>
+                                            <tr>
+                                                <td style="padding-left: 10px">
+                                                    <select id="itemsFreeTextAttributes_ItemHistoryCb" name="boostField" class="form-select"
+                                                            style="display: none"></select>
+                                                    <select id="usersFreeTextAttributes_ItemHistoryCb" name="boostField" class="form-select"
+                                                            style="display: none"></select>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td style="padding-left: 10px"><label>Boost value</label></td>
+                                            </tr>
+                                            <tr id="boostValue_ItemHistoryCb">
+                                                <td style="padding-left: 10px"><input id="boostValueInputField_ItemHistoryCb" type="text" class="form-control float-end" name="boostValue"></td>
+                                            </tr>
+                                            <tr>
+                                                <td><input class="btn btn-outline-success float-end" type="submit" name="addBooster" value="Add"></td>
+                                            </tr>
+                                        </table>
+                                    </div>
+
+                                </div>
+
+                                <div class="col-md-7" style="padding-right: 100px">
+                                    <br>
+                                    <u><b>Result Strategy</b></u>
+                                    <i id="itemHistoryCbResultStrategyInfoIcon" class="bi bi-info-circle"></i>
+                                    <br>
+
+                                    <!-- Result Strategy -->
+                                    <table style="border-collapse: separate; -webkit-border-vertical-spacing: 5px;">
+                                        <tr>
+                                            <td style="padding-left: 10px"><label>Used for the final composition step of recommendations:</label></td>
+                                        </tr>
+                                        <tr>
+                                            <td style="padding-left: 10px">
+                                                <select id="itemHistoryCbResultStrategySelect" name="resultStrategy" class="form-select" disabled
+                                                        onchange="updateItemHistoryCbResultStrategyInfoIcon(this.value)">
+                                                    <option th:each="entry : ${itemHistoryCbResultStrategies}"
+                                                            th:value="${entry}"
+                                                            th:text="${entry}"
+                                                            th:selected="${selectedResultStrategy == entry || (selectedResultStrategy == null && entry == 'roundRobinSkipItem')}"></option>
+                                                </select>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- InteractionCf -->
+                <div id="InteractionCf" class="row justify-content-start" hidden>
+                    <!-- interactionTypes -->
+                    <div class="col-md-5">
+                        <li style="display: inline-block">
+                            <div class="form-check form-switch">
+                                <input id="selectAllInteractionTypesSwitch_InteractionCf" class="form-check-input" type="checkbox"
+                                       onchange="selectAll(this, 'InteractionCf')">
+                                <label class="form-check-label" for="selectAllInteractionTypesSwitch_InteractionCf" style="">Select All</label>
+                            </div>
+                            <label style="margin-right: 10px">Calculate neighborhoods using the following interaction types:</label>
+                        </li>
+
+                        <br>
+
+                        <div th:each="entry : ${interactionTypes}"
+                             class="form-check form-check-inline" style="padding-left: 0; padding-top: 5px;">
+                            <input type="checkbox" class="btn-check" name="interactionTypes"
+                                   onclick="updateRelatedSelectAllSwitch(this);
+                                            updateInteractionTypeWeightInputAppearance(this);"
+                                   th:id="'interactionType_InteractionCf_' + ${entry.name}"
+                                   th:value="${entry.name}"
+                                   th:checked="${recoModel == 'InteractionCf' && selectedInteractionTypesMap != null && #maps.containsKey(selectedInteractionTypesMap, entry.name)}">
+                            <label class="btn btn-outline-primary" th:for="'interactionType_InteractionCf_' + ${entry.name}" th:text="${entry.name}"></label>
+                        </div>
+                    </div>
+
+                    <div class="col-md-5">
+
+                        <u id="weightsTitle_InteractionCf" hidden><b>Weights</b></u>
+                        <br>
+
+                        <table id="interactionTypesWeights_InteractionCf" style="border-collapse: separate; -webkit-border-horizontal-spacing: 10px;">
+                            <tr th:each="entry: ${interactionTypes}"
+                                th:id="'weightRow_InteractionCf_' + ${entry.name}" hidden>
+                                <td><label th:text="${entry.name} + ':'"></label></td>
+                                <td><input th:id="'weightInput_InteractionCf_' + ${entry.name}"
+                                           type="text" class="form-control float-end" placeholder="1"
+                                           onkeyup="updateInteractionTypeWeightValue(this);"></td>
+                                <td hidden><input th:id="'weightInputValueToSubmit_InteractionCf_' + ${entry.name}" name="interactionTypesWeights"
+                                                  th:value="${entry.name} + ';'"
+                                                  type="text" class="form-control float-end" disabled></td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- ContextInteractionCf -->
+                <div id="ContextInteractionCf" class="row justify-content-start" hidden>
+                    <!-- interactionTypes -->
+                    <div class="col-md-5">
+                        <li style="display: inline-block">
+                            <div class="form-check form-switch">
+                                <input id="selectAllInteractionTypesSwitch_ContextInteractionCf" class="form-check-input" type="checkbox"
+                                       onchange="selectAll(this, 'ContextInteractionCf')">
+                                <label class="form-check-label" for="selectAllInteractionTypesSwitch_ContextInteractionCf" style="">Select All</label>
+                            </div>
+                            <label style="margin-right: 10px">Calculate neighborhoods using the following interaction types:</label>
+                        </li>
+
+                        <br>
+
+                        <div th:each="entry : ${interactionTypes}"
+                             class="form-check form-check-inline" style="padding-left: 0; padding-top: 5px;">
+                            <input type="checkbox" class="btn-check" name="interactionTypes"
+                                   onclick="updateRelatedSelectAllSwitch(this);
+                                            updateInteractionTypeWeightInputAppearance(this);"
+                                   th:id="'interactionType_ContextInteractionCf_' + ${entry.name}"
+                                   th:value="${entry.name}"
+                                   th:checked="${recoModel == 'ContextInteractionCf' && selectedInteractionTypesMap != null && #maps.containsKey(selectedInteractionTypesMap, entry.name)}">
+                            <label class="btn btn-outline-primary" th:for="'interactionType_ContextInteractionCf_' + ${entry.name}" th:text="${entry.name}"></label>
+                        </div>
+                    </div>
+
+                    <div class="col-md-5">
+
+                        <u id="weightsTitle_ContextInteractionCf" hidden><b>Weights</b></u>
+                        <br>
+
+                        <table id="interactionTypesWeights_ContextInteractionCf" style="border-collapse: separate; -webkit-border-horizontal-spacing: 10px;">
+                            <tr th:each="entry: ${interactionTypes}"
+                                th:id="'weightRow_ContextInteractionCf_' + ${entry.name}" hidden>
+                                <td><label th:text="${entry.name} + ':'"></label></td>
+                                <td><input th:id="'weightInput_ContextInteractionCf_' + ${entry.name}"
+                                           type="text" class="form-control float-end" placeholder="1"
+                                           onkeyup="updateInteractionTypeWeightValue(this);"></td>
+                                <td hidden><input th:id="'weightInputValueToSubmit_ContextInteractionCf_' + ${entry.name}" name="interactionTypesWeights"
+                                                  th:value="${entry.name} + ';'"
+                                                  type="text" class="form-control float-end" disabled></td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- UserCbCf -->
+                <div id="UserCbCf" class="row justify-content-start" hidden>
+                    <div class="col-md-5">
+                        <table style="border-collapse: separate; -webkit-border-horizontal-spacing: 10px;">
+                            <tr>
+                                <td><label>Extract similar items using the following scenario:</label></td>
+                                <td>
+                                    <select id="refCbProfileSelect" name="refCbScenarioId" class="form-select"
+                                            onchange="updateItemContextAppearanceBasedOnRefCbScenario(this.value);"></select>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><label>Recent day count</label></td>
+                                <td><input type="text" class="form-control float-end" id="recentDayCount" name="recentDayCount" placeholder="60" th:value="${recentDayCount}"></td>
+                            </tr>
+                            <tr>
+                                <td><label>Similar items count</label></td>
+                                <td><input type="text" class="form-control float-end" id="similarItemsCount" name="similarItemsCount" placeholder="40" th:value="${similarItemsCount}"></td>
+                            </tr>
+                            <tr>
+                                <td><label>Use BLL</label></td>
+                                <td>
+                                    <div class="form-check form-switch">
+                                        <input class="form-check-input" type="checkbox" name="useBll" th:checked="${useBll}">
+                                    </div>
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+
+                    <!-- interactionFilterTypes -->
+                    <div class="col-md-5">
+                        <li style="display: inline-block">
+                            <div class="form-check form-switch">
+                                <input id="selectAllInteractionFilterTypesSwitch_UserCbCf" class="form-check-input" type="checkbox"
+                                       onchange="selectAll(this, 'UserCbCf')">
+                                <label class="form-check-label" for="selectAllInteractionFilterTypesSwitch_UserCbCf" style="">Select All</label>
+                            </div>
+                            <label style="margin-right: 10px">Extract users from the found items using the following interaction types:</label>
+                        </li>
+
+                        <br>
+
+                        <div th:each="entry : ${interactionTypes}"
+                             class="form-check form-check-inline" style="padding-left: 0; padding-top: 5px;">
+                            <input type="checkbox" class="btn-check" name="interactionFilterTypes"
+                                   onclick="updateRelatedSelectAllSwitch(this);"
+                                   th:id="'interactionFilterType_UserCbCf_' + ${entry.name}"
+                                   th:value="${entry.name}"
+                                   th:checked="${recoModel == 'UserCbCf' && selectedInteractionFilterTypes != null && #lists.contains(selectedInteractionFilterTypes, entry.name)}">
+                            <label class="btn btn-outline-primary" th:for="'interactionFilterType_UserCbCf_' + ${entry.name}" th:text="${entry.name}"></label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- HybridRoundRobinWeightedSum -->
+                <div id="HybridRoundRobinWeightedSum" class="row justify-content-start" hidden>
+
+                    <div class="col-md-10">
+
+                        <label>
+                            Select all desired scenarios which you would like to include into this hybrid scenario.
+                            In order to prioritize between reference scenarios, for each selected scenario you must assign a proper weight with an integer value.
+                        </label>
+                        <br><br>
+
+                        <u><b>Available profiles</b></u>
+                        <br>
+
+                        <!-- Available profiles -->
+                        <table id="hybridAvailableProfilesTable" style="border-collapse: separate; -webkit-border-horizontal-spacing: 10px;"></table>
+
+                        <br>
+
+                        <u><b>Algorithms Interruption & Time constraint</b></u>
+                        <br>
+
+                        <table id="interruptAlgosTable" style="border-collapse: separate; -webkit-border-horizontal-spacing: 10px;">
+                            <tr>
+                                <td>
+                                    <div class="form-check">
+                                        <input class="form-check-input" id="interruptAlgosCheckbox" type="checkbox" name="interruptAlgos" th:checked="${selectedHybridInterruptAlgos}">
+                                        <label class="form-check-label" for="interruptAlgosCheckbox">Interrupt recommendation algorithms on time constraint and deliver results</label>
+                                    </div>
+                                </td>
+                            </tr>
+                        </table>
+                        <br>
+
+                        <table id="hybridTimeoutTable" style="border-collapse: separate; -webkit-border-horizontal-spacing: 10px;">
+                            <tr>
+                                <td class="col-md-6">
+                                    <label>
+                                        If you would like to set a time constraint for your hybrid scenario, please provide an integer value representing desired time in <b>miliseconds</b>:
+                                    </label>
+                                </td>
+                                <td class="col-md-2">
+                                    <input id="hybridTimeoutInput" type="text" class="form-control float-end" placeholder="200" name="hybridTimeout" th:value="${selectedHybridTimeout}">
+                                </td>
+                            </tr>
+                        </table>
+                        <br>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Reminders -->
+            <div id="remindersDiv">
+                <hr style="height:5px; visibility:hidden;">
+                <h4>Consideration Of Consumed Items</h4>
+                <hr style="border: 2px solid">
+
+                <div class="container">
+                    <div class="row justify-content-start">
+                        <label>
+                            Here you can define how should recommender proceed with already consumed items:<br>
+
+                            <ul>
+                                <li>
+                                    If you would like to recommend <b>only novel items</b> please leave the "Reminders" toggle button unchecked and select all interaction types
+                                </li>
+                                <li>
+                                    If you would like to recommend <b>novel items only based on certain interactions</b>, leave the "Reminders" toggle button unchecked and select desired interactions
+                                </li>
+                                <li>
+                                    If you would like to <b>allow already consumed items</b> to appear in the recommendations, check the "Reminders" toggle button. If you would like to exclude items which users have consumed using certain interaction(s), just select those interactions to exclude related items from reminders
+                                </li>
+                            </ul>
+                        </label>
+                    </div>
+                </div>
+                <br>
+
+                <div class="container">
+                    <div class="row justify-content-start">
+                        <div class="col-md-2">
+                            <div class="form-check form-switch">
+                                <input id="remindersSwitch" name="reminders" class="form-check-input" type="checkbox"
+                                       onchange="remindersChecked(this)"
+                                       th:checked="${reminders}">
+                                <label class="form-check-label" for="remindersSwitch">Reminders</label>
+                            </div>
+                        </div>
+
+                        <!-- interactionFilterTypes -->
+                        <div class="col-md-7">
+                            <li style="display: inline-block">
+                                <div class="form-check form-switch">
+                                    <input id="selectAllInteractionFilterTypesSwitch_Reminders" class="form-check-input" type="checkbox"
+                                           onchange="selectAll(this, 'Reminders')">
+                                    <label class="form-check-label" for="selectAllInteractionFilterTypesSwitch_Reminders" style="">Select All</label>
+                                </div>
+                                <label style="margin-right: 10px">Do not recommend items which were already consumed via the following interactions:</label>
+                            </li>
+
+                            <br>
+
+                            <div th:each="entry : ${interactionTypes}"
+                                 class="form-check form-check-inline" style="padding-left: 0; padding-top: 5px;">
+                                <input type="checkbox" class="btn-check" name="interactionFilterTypes"
+                                       onclick="updateRelatedSelectAllSwitch(this);"
+                                       th:id="'interactionFilterType_Reminders_' + ${entry.name}"
+                                       th:value="${entry.name}"
+                                       th:checked="${selectedInteractionFilterTypes != null && #lists.contains(selectedInteractionFilterTypes, entry.name)}">
+                                <label class="btn btn-outline-primary" th:for="'interactionFilterType_Reminders_' + ${entry.name}" th:text="${entry.name}"></label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Business Rules -->
+            <div id="businessRulesDiv">
+                <hr style="height:5px; visibility:hidden;">
+                <h4>Business Rules</h4>
+                <hr style="border: 2px solid">
+
+                <label>Recommend items which fulfill all of the following criteria:</label>
+                <br>
+                <br>
+
+                <div class="container">
+                    <div class="row justify-content-start">
+                        <!-- List all existing business rules -->
+                        <input id="ruleIdToDeleteInput" type="text" name="ruleIdToDelete" hidden>
+                        <div th:if="${not #lists.isEmpty(businessRules)}" class="col-md-4">
+                            <table class="table" style="border-collapse: separate; -webkit-border-horizontal-spacing: 5px;">
+                                <tr>
+                                    <th scope="col">Attribute</th>
+                                    <th scope="col">Value</th>
+                                    <th scope="col">Exclude</th>
+                                    <th scope="col" th:hidden="${scenarioDeployed == true}"></th>
+                                </tr>
+                                <tr th:each="entry : ${businessRules}">
+                                    <td><label th:text="${entry.attribute}"></label></td>
+                                    <td th:if="${entry.value != null}"><label th:text="${entry.value}"></label></td>
+                                    <td th:if="${entry.value == null}">
+                                        <label th:text="'From: ' + ${entry.valueFrom}"></label><br>
+                                        <label th:text="'To: ' + ${entry.valueTo}"></label>
+                                    </td>
+                                    <td><label th:text="${entry.exclude}"></label></td>
+                                    <td style="text-align: center; vertical-align: middle;">
+                                        <input class="btn btn-danger" type="submit" name="deleteRule" value="Delete"
+                                               th:hidden="${scenarioDeployed == true}"
+                                               th:attr="onclick=|document.getElementById('ruleIdToDeleteInput').value = '${entry.id}'|" >
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+
+                        <div class="col-md-3">
+                            <!-- Business rules -->
+                            <table style="border-collapse: separate; -webkit-border-horizontal-spacing: 5px;">
+                                <tr>
+                                    <td><label>Recommendations from a category</label></td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <div class="form-check form-check-inline" style="padding-left: 0">
+                                <span id="tooltipSpan" class="d-inline-block" tabindex="0" data-bs-toggle="tooltip">
+                                    <input type="checkbox" class="btn-check" name="rule" id="filterQuery"
+                                           value="Filter Query" onclick="filterQueryCheckboxChange(this)">
+                                    <label id="filterQueryLabel" class="btn btn-outline-primary" for="filterQuery">
+                                        Filter Query
+                                    </label>
+                                </span>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+
+                        <div class="col-md-2" id="filterQueryForm" style="display: none">
+                            <table style="border-collapse: separate; -webkit-border-vertical-spacing: 5px;">
+                                <tr>
+                                    <td style="padding-left: 10px"><label>Pick an attribute</label></td>
+                                </tr>
+                                <tr>
+                                    <td style="padding-left: 10px">
+                                        <select id="itemsEntityAttributes" name="attribute" class="form-select" style="display: none"
+                                                onchange="adaptValueRangeAppearance(this);"></select>
+                                        <select id="usersEntityAttributes" name="attribute" class="form-select" style="display: none"
+                                                onchange="adaptValueRangeAppearance(this);"></select>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td style="padding-left: 10px"><label>Expected value</label></td>
+                                </tr>
+                                <tr id="valueInput">
+                                    <td style="padding-left: 10px"><input type="text" class="form-control float-end" id="valueInputField" name="value"></td>
+                                </tr>
+                                <tr id="rangeValueInput" style="display: none">
+                                    <td style="padding-left: 10px">
+                                        <table>
+                                            <tr>
+                                                <td><label>From</label></td>
+                                                <td><input type="text" class="form-control float-end" id="valueFromInputField" name="valueFrom"></td>
+                                                <td><label>To</label></td>
+                                                <td><input type="text" class="form-control float-end" id="valueToInputField" name="valueTo"></td>
+                                            </tr>
+                                        </table>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td><input class="btn btn-outline-success float-end" type="submit" name="addRule" value="Add"></td>
+                                </tr>
+                            </table>
+                        </div>
+
+                        <div class="col-md-3" id="filterQueryFormSettings" style="display: none">
+                            <table style="border-collapse: separate; -webkit-border-vertical-spacing: 5px;">
+                                <tr>
+                                    <td>
+                                        <div class="form-check form-switch">
+                                            <input id="excludeSwitch" class="form-check-input" type="checkbox" name="exclude">
+                                            <label class="form-check-label" for="excludeSwitch">Exclude</label>
+                                        </div>
+
+                                        <div id="rangeSwitchDiv" class="form-check form-switch" style="display: none">
+                                            <input id="rangeSwitch" class="form-check-input" type="checkbox"
+                                                   onchange="updateBusinessRuleValueInput(this)">
+                                            <label class="form-check-label" for="rangeSwitch">Expected value is range</label>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <script th:inline="javascript">
+            /**
+             * This is the "global"/on-page-load code logic which is performed each time this view is being loaded
+             * in order to load all UI model variable values and set already defined and saved options for observed
+             * recommendation scenario which can be used later on within this script.
+             */
+            /*<![CDATA[*/
+            var scenarioDeployed = /*[[${scenarioDeployed}]]*/ null;
+            var recoObject = /*[[${recoObject}]]*/ null;
+            var recoEntity = /*[[${recoEntity}]]*/ null;
+            var recoModel = /*[[${recoModel}]]*/ null;
+            var itemContext = /*[[${itemContext}]]*/ null;
+            var refCbScenarioId = /*[[${refCbScenarioId}]]*/ null;
+
+            var itemsEntityFieldsMap = /*[[${itemsEntityFieldsMap}]]*/ null;
+            itemsEntityFieldsMap = new Map(Object.entries(itemsEntityFieldsMap));
+
+            var usersEntityFieldsMap = /*[[${usersEntityFieldsMap}]]*/ null;
+            usersEntityFieldsMap = new Map(Object.entries(usersEntityFieldsMap));
+
+            var cbProfilesMap = /*[[${cbProfilesMap}]]*/ null;
+            cbProfilesMap = new Map(Object.entries(cbProfilesMap));
+
+            var interactionTypes = /*[[${interactionTypes}]]*/ null;
+
+            var selectedResultStrategy = /*[[${selectedResultStrategy}]]*/ null;
+            var fetchFromInteractionsCore = /*[[${fetchFromInteractionsCore}]]*/ false;
+
+            var selectedInteractionTypesMap = /*[[${selectedInteractionTypesMap}]]*/ null;
+
+            if (selectedInteractionTypesMap !== null) {
+                selectedInteractionTypesMap = new Map(Object.entries(selectedInteractionTypesMap));
+            }
+
+            var selectedInteractionFilterTypes = /*[[${selectedInteractionFilterTypes}]]*/ null;
+            var selectedUserHistoryInteractionTypes = /*[[${selectedUserHistoryInteractionTypes}]]*/ null;
+            /*]]>*/
+
+            updateUserHistoryInteractionsCountInputAppearance(fetchFromInteractionsCore);
+
+            if (recoObject !== null) {
+                let idToActivate;
+                if (recoObject === 'items') {
+                    idToActivate = 'itemsAlgos';
+                } else {
+                    idToActivate = 'usersAlgos';
+                    document.getElementById('remindersDiv').hidden = true;
+                    document.getElementById('remindersSwitch').checked = false;
+                }
+
+                updateRecoModelAppearance(idToActivate);
+
+                if (recoModel !== null) {
+                    document.getElementById(idToActivate).value = recoModel;
+                    updateModelSpecificSettings(recoModel, false);
+                    presentAdequateSections(recoObject, recoModel);
+                    loadItemContextAppearance(recoModel);
+
+                    if (recoModel === 'ItemCb') {
+                        updateItemCbResultStrategyInfoIcon(selectedResultStrategy);
+                    } else if (recoModel === 'ItemHistoryCb') {
+                        updateItemHistoryCbResultStrategyInfoIcon(selectedResultStrategy);
+                    }
+
+                    if (recoModel === 'UserCbCf' && refCbScenarioId !== null && itemContext !== null) {
+                        if (isItemContextMandatoryForRefCbProfile(refCbScenarioId)) {
+                            disableOtherItemContextValues(itemContext);
+                        }
+                    }
+
+                    if (['InteractionCf', 'ContextInteractionCf'].includes(recoModel) && selectedInteractionTypesMap !== null) {
+                        presentSelectedInteractionTypesWeights(recoModel);
+                    }
+                }
+            }
+
+            updateMltBoostersAppearance();
+            updateRefCbProfilesToShow(itemContext);
+
+            if (interactionTypes !== null && interactionTypes.length > 0 &&
+                (selectedInteractionTypesMap !== null || selectedInteractionFilterTypes !== null ||
+                    selectedUserHistoryInteractionTypes !== null)) {
+                checkSelectAllSwitchesStates(
+                    recoModel,
+                    selectedInteractionTypesMap,
+                    selectedInteractionFilterTypes,
+                    selectedUserHistoryInteractionTypes);
+            }
+
+            updateFilterQueryAppearance(recoObject, recoEntity);
+
+            if (scenarioDeployed) {
+                disableAllElements();
+            }
+
+
+            /**
+             * If domain has been deployed all input elements need to be disabled for input.
+             * Use this view as a simple preview of scenario settings.
+             *
+             */
+            function disableAllElements() {
+                let i;
+                let inputs = document.getElementsByTagName("input");
+                for (i = 0; i < inputs.length; i++) {
+                    inputs[i].disabled = true;
+                }
+                let selects = document.getElementsByTagName("select");
+                for (i = 0; i < selects.length; i++) {
+                    selects[i].disabled = true;
+                }
+                let textareas = document.getElementsByTagName("textarea");
+                for (i = 0; i < textareas.length; i++) {
+                    textareas[i].disabled = true;
+                }
+                let buttons = document.getElementsByTagName("button");
+                for (i = 0; i < buttons.length; i++) {
+                    buttons[i].disabled = true;
+                }
+            }
+
+            /**
+             * Function responsible for dynamic presentation of scenario id based on input value for scenario name.
+             *
+             * @param inputValue input value from scenario name input field
+             */
+            function presentScenarioId(inputValue) {
+                let scenarioIdDynamicSpan = document.getElementById("scenarioIdDynamicSpan");
+                scenarioIdDynamicSpan.innerHTML = inputValue.split(/[\s]+/).join("-").toLowerCase();
+            }
+
+
+            /**
+             * Based on the already chosen and stored recommendation model value, item context switch and
+             * item context dropdown will be adequately presented with related values.
+             */
+            function loadItemContextAppearance(algo) {
+                const contextMandatory = ['ContextInteractionCf', 'ItemCb', 'UserCbCf'];
+
+                let itemContextSwitch = document.getElementById('itemContextSwitch');
+                let itemContextSelect = document.getElementById('itemContextSelect');
+                let itemContextIconMandatory = document.getElementById('itemContextIconMandatory');
+
+                if (contextMandatory.includes(algo)) {
+                    itemContextSwitch.checked = true;
+                    itemContextSwitch.setAttribute('onclick', 'return false;');
+
+                    itemContextSelect.disabled = false;
+                    itemContextIconMandatory.hidden = false;
+                }
+            }
+
+
+
+            /**
+             * Based on the chosen recommendation algorithm, item context switch and item context dropdown will be
+             * adequately presented with related values.
+             */
+            function updateItemContextAppearance(algo) {
+                const contextMandatory = ['ContextInteractionCf', 'ItemCb', 'UserCbCf'];
+
+                let itemContextSwitch = document.getElementById('itemContextSwitch');
+                let itemContextSelect = document.getElementById('itemContextSelect');
+                let itemContextIconMandatory = document.getElementById('itemContextIconMandatory');
+
+                // reset the values of itemContextSelect dropdown
+                resetItemContextToDefaultOptions();
+
+                if (contextMandatory.includes(algo)) {
+                    itemContextSwitch.checked = true;
+                    itemContextSwitch.setAttribute('onclick', 'return false;');
+
+                    itemContextSelect.disabled = false;
+                    itemContextIconMandatory.hidden = false;
+
+                    let potentialItemContextValue = document.getElementById('recoOptionSelect').value.split(';')[1];
+                    if (itemContextSelectContainsOption(itemContextSelect, potentialItemContextValue)) {
+                        itemContextSelect.value = potentialItemContextValue;
+                    } else {
+                        itemContextSelect.selectedIndex = 0;
+                    }
+                } else { // if context optional or in any other case
+                    itemContextSwitch.checked = false;
+                    itemContextSwitch.removeAttribute('onclick');
+
+                    itemContextSelect.disabled = true;
+                    itemContextSelect.selectedIndex = 0;
+                    itemContextIconMandatory.hidden = true;
+                }
+            }
+
+            /**
+             * When a new recommendation object has been chosen or recommendation model, reset possible item context
+             * values in related dropdown to default options.
+             */
+            function resetItemContextToDefaultOptions() {
+                /*<![CDATA[*/
+                var itemsEntities = /*[[${itemsEntities}]]*/ [];
+                /*]]>*/
+
+                let str = '<option value=\"\" selected disabled hidden>Choose Context</option>';
+
+                for (const itemContext of itemsEntities) {
+                    str += "<option value=\"" + itemContext + "\"" + ">" + itemContext + "</option>";
+                }
+                let itemContextSelect = document.getElementById('itemContextSelect');
+                itemContextSelect.innerHTML = str;
+            }
+
+            /**
+             * Checks if observed value exists in given select option element.
+             *
+             * @param selectElement select element with options
+             * @param valueToCheck  value which existence is being checked for a given select option element
+             * return true if exists, false otherwise
+             */
+            function itemContextSelectContainsOption(selectElement, valueToCheck) {
+                for(let i = 0, opts = selectElement.options; i < opts.length; ++i) {
+                    if(opts[i].value === valueToCheck) {
+                        return true;
+                    }
+                }
+                return false;
+            }
+
+            /**
+             * Based on the checked/not-checked option of item context, belonging
+             * dropdown will be enabled/disabled together with possible options to choose.
+             */
+            function updateItemContextDropdown() {
+                let itemContextSelect = document.getElementById('itemContextSelect');
+                if (document.getElementById('itemContextSwitch').checked) {
+                    itemContextSelect.disabled = false;
+                } else {
+                    itemContextSelect.disabled = true;
+                    itemContextSelect.selectedIndex = 0;
+                }
+            }
+
+            /**
+             * Updates Item context dropdown options based on chosen reference CB scenario.
+             * That is, item context dropdown options will automatically be set if a chosen reference CB scenario is
+             * 'ItemCb' since this recommendation model has item context parameter as mandatory one.
+             * On contrary, if chosen reference CB scenario is 'ItemHistoryCb' which has item context parameter as an
+             * optional parameter, then the item context dropdown will only be updated with one and only possible,
+             * relevant value to choose but will remain as optional
+             * (e.g. Item Context switch will be turned off - possible to turn on to include item context if desired).
+             *
+             * @param refCbScenarioId reference CB scenario id which has been chosen
+             */
+            function updateItemContextAppearanceBasedOnRefCbScenario(refCbScenarioId) {
+                let chosenItemContext = null;
+                let chosenScenario = null;
+                for (const [itemContext, scenarios] of globalThis.cbProfilesMap.entries()) {
+                    for (const scenario of scenarios) {
+                        if (scenario.id === refCbScenarioId) {
+                            chosenScenario = scenario;
+                            chosenItemContext = itemContext;
+                            break;
+                        }
+                    }
+                    if (chosenScenario !== null) {
+                        break;
+                    }
+                }
+
+                let itemContextSwitch = document.getElementById('itemContextSwitch');
+                let itemContextSelect = document.getElementById('itemContextSelect');
+
+                itemContextSwitch.checked = true;
+                itemContextSwitch.setAttribute('onclick', 'return false;');
+                itemContextSelect.disabled = false;
+
+                if (chosenItemContext !== 'no-context') {
+                    itemContextSelect.value = chosenItemContext;
+                    disableOtherItemContextValues(chosenItemContext);
+                } else {
+                    resetItemContextToDefaultOptions();
+                    itemContextSelect.selectedIndex = 0;
+                }
+            }
+
+            /**
+             * If item context alreadz has been chosen for the reference CB profile, onlz the exact same item context
+             * value will be allowed to choose from all the options. All other options will be disabled.
+             *
+             * @param chosenItemContext item context value that belongs to reference CB profile
+             */
+            function disableOtherItemContextValues(chosenItemContext) {
+                /*<![CDATA[*/
+                var itemsEntities = /*[[${itemsEntities}]]*/ [];
+                /*]]>*/
+
+                let str = "";
+                for (const itemContext of itemsEntities) {
+                    if (itemContext === chosenItemContext) {
+                        str += "<option value=\"" + itemContext + "\"" + ">" + itemContext + "</option>";
+                    } else {
+                        str += "<option value=\"" + itemContext + "\"" + " disabled>" + itemContext + "</option>";
+                    }
+                }
+                let itemContextSelect = document.getElementById('itemContextSelect');
+                itemContextSelect.innerHTML = str;
+            }
+
+            /**
+             * Checks if observed reference CB profile has item context as mandatory setting.
+             *
+             * @param refCbScenarioId reference CB profile id that is being checked
+             */
+            function isItemContextMandatoryForRefCbProfile(refCbScenarioId) {
+                let targetProfile = null;
+                for (const [itemContext, profiles] of globalThis.cbProfilesMap) {
+                    for (const profile of profiles) {
+                        if (profile.id === refCbScenarioId) {
+                            targetProfile = profile;
+                            break;
+                        }
+                    }
+                    if (targetProfile !== null) {
+                        break;
+                    }
+                }
+
+                if (targetProfile.recoModel === 'ItemCb') {
+                    return true;
+                }
+
+                return false;
+            }
+
+            /**
+             * Based on the submitted option of the triggering object, adequate recommendation model dropdown with
+             * possible values (i.e., recommendation algorithms) will be displayed.
+             *
+             * @param triggerObject html object that triggers update action for adequate recommendation model dropdown
+             *                      to appear based on the chosen option
+             */
+            function updatePossibleRecoModels(triggerObject) {
+                let recoObject = triggerObject.value.split(";")[0];
+
+                makeAllModelSpecificSettingsInvisibleAndResetInputValues();
+
+                let idToActivate;
+                if (recoObject === 'items') {
+                    idToActivate = 'itemsAlgos';
+                } else {
+                    idToActivate = 'usersAlgos';
+                }
+                updateRecoModelAppearance(idToActivate);
+            }
+
+            /**
+             * Makes adequate recommendation model dropdown visible.
+             *
+             * @param idToActivate id of the proper recommendation model dropdown to activate (i.e., make visible)
+             */
+            function updateRecoModelAppearance(idToActivate) {
+                makeAllRecoModelSelectsInvisible();
+
+                let recoModelSelect = document.getElementById(idToActivate);
+                recoModelSelect.style.display = "block";
+            }
+
+            /**
+             * Makes all recommendation model dropdowns to disappear.
+             */
+            function makeAllRecoModelSelectsInvisible() {
+                document.getElementById('placeholder').style.display = "none";
+                document.getElementById('itemsAlgos').style.display = "none";
+                document.getElementById('usersAlgos').style.display = "none";
+
+                document.getElementById('itemsAlgos').selectedIndex = 0;
+                document.getElementById('usersAlgos').selectedIndex = 0;
+            }
+
+            /**
+             * Manages the section appearance called "Consideration Of Consumed Items" where the reminders are defined.
+             *
+             * @param recoOption chosen reco option
+             */
+            function updateConsiderationOfConsumedItems(recoOption) {
+                let recoObject = recoOption.value.split(';')[0];
+
+                let remindersDiv = document.getElementById('remindersDiv');
+                let remindersSwitch = document.getElementById('remindersSwitch');
+                if (recoObject === 'users') {
+                    remindersDiv.hidden = true;
+                    remindersSwitch.checked = false;
+                } else {
+                    remindersDiv.hidden = false;
+                }
+            }
+
+            /**
+             * Based on chosen/saved scenario preferences for recommendation object, entity and model,
+             * adequate sections are being presented.
+             */
+            function updateScenarioSettingsAppearance() {
+                let scenarioSettingsDiv = document.getElementById('scenarioSettingsDiv');
+                let recoOption = document.getElementById('recoOptionSelect').value;
+
+                if (!recoOption) {
+                    scenarioSettingsDiv.hidden = true;
+                    return;
+                }
+                let recoObject = recoOption.split(';')[0];
+
+                let recoModel;
+                if (recoObject === 'items') {
+                    recoModel = document.getElementById('itemsAlgos').value;
+                } else {
+                    recoModel = document.getElementById('usersAlgos').value;
+                }
+
+                if (!recoModel) {
+                    scenarioSettingsDiv.hidden = true;
+                    return;
+                }
+                presentAdequateSections(recoObject, recoModel);
+            }
+
+            /**
+             * Handles proper presentation of scenario configuration sections based on chosen recommendation object
+             * (i.e., items or users) and recommendation model (i.e., algorithm).
+             *
+             * @param recoObject    chosen recommendation object
+             * @param recoModel     chosen recommendation model
+             */
+            function presentAdequateSections(recoObject, recoModel) {
+                /*<![CDATA[*/
+                var selectedInteractionTypesMap = /*[[${selectedInteractionTypesMap}]]*/ null;
+
+                if (selectedInteractionTypesMap !== null) {
+                    selectedInteractionTypesMap = new Map(Object.entries(selectedInteractionTypesMap));
+                }
+
+                var selectedInteractionFilterTypes = /*[[${selectedInteractionFilterTypes}]]*/ null;
+                var selectedUserHistoryInteractionTypes = /*[[${selectedUserHistoryInteractionTypes}]]*/ null;
+                var selectedResultStrategy = /*[[${selectedResultStrategy}]]*/ null;
+                /*]]>*/
+
+                const userHistoryNotAvailable = ['ItemMp', 'ItemCb', 'UserCbCf'];
+                const userHistoryMandatory = ['InteractionCf', 'ContextInteractionCf', 'ItemHistoryCb'];
+                const selectAllInteractionTypesByDefault = ['ItemMp', 'InteractionCf', 'ContextInteractionCf'];
+                const selectAllInteractionFilterTypesByDefault = ['UserCbCf'];
+
+                let scenarioSettingsDiv = document.getElementById('scenarioSettingsDiv');
+                if (!recoObject || !recoModel) {
+                    scenarioSettingsDiv.hidden = true;
+                    return;
+                }
+
+                scenarioSettingsDiv.hidden = false;
+
+                if (recoModel === 'HybridRoundRobinWeightedSum') {
+                    document.getElementById('userHistoryDiv').hidden = true;
+                    document.getElementById('remindersSwitch').checked = false;
+                    document.getElementById('remindersDiv').hidden = true;
+                    document.getElementById('businessRulesDiv').hidden = true;
+                    document.getElementById('itemContextSwitch').disabled = true;
+
+                    updateAvailableRefScenarios();
+                    return;
+                }
+
+                if (recoObject === 'users') {
+                    document.getElementById('remindersDiv').hidden = true;
+                    document.getElementById('remindersSwitch').checked = false;
+                }
+
+                if (selectedResultStrategy === null) {
+                    document.getElementById('itemCbResultStrategySelect').value = "";
+                    document.getElementById('itemCbResultStrategySelect').disabled = true;
+
+                    document.getElementById('itemHistoryCbResultStrategySelect').value = "";
+                    document.getElementById('itemHistoryCbResultStrategySelect').disabled = true;
+                }
+
+                if (recoModel === 'ItemCb') {
+                    document.getElementById('mltMaxResults_ItemCb').disabled = false;
+                    document.getElementById('maxqt_ItemCb').disabled = false;
+                    document.getElementById('mindf_ItemCb').disabled = false;
+                    document.getElementById('mintf_ItemCb').disabled = false;
+                    document.getElementById('minwl_ItemCb').disabled = false;
+                    document.getElementById('boostValueInputField_ItemCb').disabled = false;
+                    document.getElementById('boosterIdToDeleteInput_ItemCb').disabled = false;
+
+                    document.getElementById('mltMaxResults_ItemHistoryCb').disabled = true;
+                    document.getElementById('maxqt_ItemHistoryCb').disabled = true;
+                    document.getElementById('mindf_ItemHistoryCb').disabled = true;
+                    document.getElementById('mintf_ItemHistoryCb').disabled = true;
+                    document.getElementById('minwl_ItemHistoryCb').disabled = true;
+                    document.getElementById('boostValueInputField_ItemHistoryCb').disabled = true;
+                    document.getElementById('boosterIdToDeleteInput_ItemHistoryCb').disabled = true;
+
+                    document.getElementById('itemCbResultStrategySelect').disabled = false;
+
+                    if (selectedResultStrategy === null) {
+                        document.getElementById('itemCbResultStrategySelect').value = "roundRobinSkipItem";
+                    }
+                } else if (recoModel === 'ItemHistoryCb') {
+                    document.getElementById('mltMaxResults_ItemHistoryCb').disabled = false;
+                    document.getElementById('maxqt_ItemHistoryCb').disabled = false;
+                    document.getElementById('mindf_ItemHistoryCb').disabled = false;
+                    document.getElementById('mintf_ItemHistoryCb').disabled = false;
+                    document.getElementById('minwl_ItemHistoryCb').disabled = false;
+                    document.getElementById('boostValueInputField_ItemHistoryCb').disabled = false;
+                    document.getElementById('boosterIdToDeleteInput_ItemHistoryCb').disabled = false;
+
+                    document.getElementById('mltMaxResults_ItemCb').disabled = true;
+                    document.getElementById('maxqt_ItemCb').disabled = true;
+                    document.getElementById('mindf_ItemCb').disabled = true;
+                    document.getElementById('mintf_ItemCb').disabled = true;
+                    document.getElementById('minwl_ItemCb').disabled = true;
+                    document.getElementById('boostValueInputField_ItemCb').disabled = true;
+                    document.getElementById('boosterIdToDeleteInput_ItemCb').disabled = true;
+
+                    document.getElementById('itemHistoryCbResultStrategySelect').disabled = false;
+
+                    if (selectedResultStrategy === null) {
+                        document.getElementById('itemHistoryCbResultStrategySelect').value = "roundRobinSkipItem";
+                    }
+                }
+
+                if (userHistoryNotAvailable.includes(recoModel)) {
+                    document.getElementById('userHistoryDiv').hidden = true;
+                    let userHistorySelectAllSwitch = document.getElementById('selectAllInteractionTypesSwitch_userHistory');
+                    userHistorySelectAllSwitch.checked = false;
+                    selectAll(userHistorySelectAllSwitch, 'userHistory');
+                }
+
+                if (userHistoryMandatory.includes(recoModel)) {
+                    document.getElementById('userHistoryDiv').hidden = false;
+
+                    if (selectedUserHistoryInteractionTypes === null) {
+                        let userHistorySelectAllSwitch = document.getElementById('selectAllInteractionTypesSwitch_userHistory');
+                        userHistorySelectAllSwitch.checked = true;
+                        selectAll(userHistorySelectAllSwitch, 'userHistory');
+                    }
+                }
+
+                if (selectAllInteractionTypesByDefault.includes(recoModel)) {
+                    if (selectedInteractionTypesMap === null) {
+                        let algoInteractionTypeSelectAllSwitch = document.getElementById('selectAllInteractionTypesSwitch_' + recoModel);
+                        algoInteractionTypeSelectAllSwitch.checked = true;
+                        selectAll(algoInteractionTypeSelectAllSwitch, recoModel);
+                    }
+                }
+
+                if (selectAllInteractionFilterTypesByDefault.includes(recoModel)) {
+                    if (selectedInteractionFilterTypes === null) {
+                        let algoInteractionFilterTypeSelectAllSwitch = document.getElementById('selectAllInteractionFilterTypesSwitch_' + recoModel);
+                        algoInteractionFilterTypeSelectAllSwitch.checked = true;
+                        selectAll(algoInteractionFilterTypeSelectAllSwitch, recoModel);
+                    }
+                }
+            }
+
+            /**
+             * Updates table content for reference scenarios available to choose from based on chosen recommendation option.
+             * That is, based on chosen recommendation option this function will dynamically update the table content.
+             */
+            function updateAvailableRefScenarios() {
+                /*<![CDATA[*/
+                var refScenarios = /*[[${refScenarios}]]*/ null;
+                var scenarioName = /*[[${scenarioName}]]*/ null;
+                var selectedHybridPropertiesMap = /*[[${selectedHybridPropertiesMap}]]*/ null;
+
+                if (selectedHybridPropertiesMap !== null) {
+                    selectedHybridPropertiesMap = new Map(Object.entries(selectedHybridPropertiesMap));
+                }
+                /*]]>*/
+
+                if (refScenarios === null) {
+                    document.getElementById('scenarioSettingsDiv').hidden = true;
+                    document.getElementById('noRefScenarioWarning').hidden = false;
+                    return;
+                }
+
+                let recoOption = document.getElementById('recoOptionSelect');
+                let recoObject = recoOption.value.split(";")[0];
+                let recoEntity = recoOption.value.split(";")[1];
+
+                let availableRefScenarios = [];
+                refScenarios.forEach((scenario) => {
+                    if (scenario.recoObject === recoObject &&
+                        scenario.recoEntity === recoEntity &&
+                        scenario.name !== scenarioName) {
+                        availableRefScenarios.push(scenario);
+                    }
+                });
+
+                if (availableRefScenarios.length < 2) {
+                    document.getElementById('scenarioSettingsDiv').hidden = true;
+                    document.getElementById('noRefScenarioWarning').hidden = false;
+                    return;
+                }
+
+                let table = document.getElementById('hybridAvailableProfilesTable');
+
+                if (table.rows.length === 0) {
+                    availableRefScenarios.forEach((scenario) => {
+                        let row = document.createElement("tr");
+                        let cell1 = document.createElement("td");
+
+                        let checkboxDiv = document.createElement("div");
+                        checkboxDiv.className = "form-check";
+
+                        let checkbox = document.createElement("input");
+                        checkbox.className = "form-check-input";
+                        checkbox.type = "checkbox";
+                        checkbox.value = scenario.id;
+                        checkbox.name = "refScenarioIds";
+                        checkbox.id = "checkbox_" + scenario.id;
+                        checkbox.onclick = function() { updateHybridProfileWeightInputAppearance(checkbox, scenario.id); }
+
+                        let checkboxLabel = document.createElement("label");
+                        checkboxLabel.className = "form-check-label";
+                        checkboxLabel.htmlFor = "checkbox_" + scenario.id;
+                        checkboxLabel.textContent = scenario.name;
+
+                        let cell2 = document.createElement("td");
+                        cell2.id = "td_" + scenario.id;
+                        cell2.style.paddingLeft = "30px";
+
+                        let weightInput = document.createElement("input");
+                        weightInput.id = "input_" + scenario.id;
+                        weightInput.type = "text";
+                        weightInput.placeholder = "weight";
+                        weightInput.className = "form-control float-end";
+                        weightInput.name = "hybridProfilesWeights";
+
+                        if (selectedHybridPropertiesMap !== null && selectedHybridPropertiesMap.has(scenario.id)) {
+                            checkbox.checked = true;
+                            weightInput.value = selectedHybridPropertiesMap.get(scenario.id).toString();
+                        } else {
+                            cell2.hidden = true;
+                            weightInput.disabled = true;
+                        }
+
+                        checkboxDiv.appendChild(checkbox);
+                        checkboxDiv.appendChild(checkboxLabel);
+
+                        cell1.appendChild(checkboxDiv);
+                        cell2.appendChild(weightInput);
+
+                        row.appendChild(cell1);
+                        row.appendChild(cell2);
+                        table.appendChild(row);
+                    });
+                }
+            }
+
+            /**
+             * Updates weight input field appearance and its functionality (e.g. enables it and presents).
+             *
+             * @param triggerObject triggering checkbox
+             * @param refScenarioId reference scenario id involved in action
+             */
+            function updateHybridProfileWeightInputAppearance(triggerObject, refScenarioId) {
+                let weightCell = document.getElementById("td_" + refScenarioId);
+                let weightInputField = document.getElementById("input_" + refScenarioId);
+
+                weightCell.hidden = !triggerObject.checked;
+                weightInputField.value = "";
+                weightInputField.disabled = !triggerObject.checked;
+            }
+
+
+            /**
+             * Loads the selected interaction types and related weights if they exist, and presents them to the customer
+             * in the observed dashboard view.
+             *
+             * @param recoModel chosen recommendation model for which the selected interaction types and related weights
+             *                  are being loaded and presented in this dashboard view
+             */
+            function presentSelectedInteractionTypesWeights(recoModel) {
+                /*<![CDATA[*/
+                var interactionTypes = /*[[${interactionTypes}]]*/ null;
+
+                var selectedInteractionTypesMap = /*[[${selectedInteractionTypesMap}]]*/ null;
+
+                if (selectedInteractionTypesMap !== null) {
+                    selectedInteractionTypesMap = new Map(Object.entries(selectedInteractionTypesMap));
+                }
+                /*]]>*/
+
+                document.getElementsByName('interactionTypes').forEach((element) => {
+                    if (element.id.split('_')[1] === recoModel && element.checked === true) {
+                        let fieldName = element.id.replace(/([^\_]*\_){2}/, '');
+
+                        let subsectionTitle = document.getElementById('weightsTitle_' + recoModel);
+                        let weightRow = document.getElementById('weightRow_' + recoModel + '_' + fieldName);
+                        let weightInput = document.getElementById('weightInput_' + recoModel + '_' + fieldName);
+                        let weightInputSubmitValue = document.getElementById('weightInputValueToSubmit_' + recoModel + '_' + fieldName);
+
+                        subsectionTitle.hidden = false;
+                        weightRow.hidden = false;
+                        weightInputSubmitValue.disabled = false;
+
+                        let selectedInteractionTypeWeight = selectedInteractionTypesMap.get(fieldName);
+
+                        if (selectedInteractionTypeWeight === null) {
+                            weightInputSubmitValue.value = fieldName + ";";
+                        } else {
+                            weightInputSubmitValue.value = fieldName + ";" + selectedInteractionTypeWeight;
+                        }
+
+                        weightInput.value = selectedInteractionTypeWeight;
+                    }
+                });
+            }
+
+            /**
+             * Function responsible for updating appearance of the weight input field for related interaction type
+             * checkbox button.
+             *
+             * @param triggerObject interaction type checkobx button from model specific settings for which the weight
+             *                      input field has to be presented or disabled and hidden depending if it is checked
+             *                      or not
+             */
+            function updateInteractionTypeWeightInputAppearance(triggerObject) {
+                /*<![CDATA[*/
+                var interactionTypes = /*[[${interactionTypes}]]*/ null;
+                /*]]>*/
+
+                let split = triggerObject.id.split('_');
+                let group = split[1];
+                let fieldName = triggerObject.value;
+
+                let subsectionTitle = document.getElementById('weightsTitle_' + group);
+                let weightRow = document.getElementById('weightRow_' + group + '_' + fieldName);
+                let weightInput = document.getElementById('weightInput_' + group + '_' + fieldName);
+                let weightInputValueToSubmit = document.getElementById('weightInputValueToSubmit_' + group + '_' + fieldName);
+
+                if (triggerObject.checked) {
+                    subsectionTitle.hidden = false;
+
+                    weightRow.hidden = false;
+                    weightInputValueToSubmit.disabled = false;
+                } else {
+                    weightRow.hidden = true;
+                    weightInput.value = "";
+                    weightInputValueToSubmit.value = "";
+                    weightInputValueToSubmit.disabled = true;
+
+                    // check if all are deselected and hide the title if so
+                    let notChecked = 0;
+                    document.getElementsByName('interactionTypes').forEach((element) => {
+                        if (element.id.split('_')[1] === group && element.checked === false) {
+                            notChecked += 1;
+                        }
+                    });
+
+                    if (notChecked === interactionTypes.length) {
+                        subsectionTitle.hidden = true;
+                    }
+                }
+            }
+
+            /**
+             * Function which prepares the input value for interaction type weight for submission.
+             * The input value is concatenated with the input field name in a following format -> "fieldName;value".
+             *
+             * @param triggerObject weight value from weight input field which needs to be updated for submission
+             */
+            function updateInteractionTypeWeightValue(triggerObject) {
+                let group = triggerObject.id.split('_')[1];
+                let fieldName = triggerObject.id.replace(/([^\_]*\_){2}/, '');
+                let inputValue = triggerObject.value;
+
+                let weightInputValueToSubmit = document.getElementById('weightInputValueToSubmit_' + group + '_' + fieldName);
+                weightInputValueToSubmit.value = fieldName + ";" + inputValue;
+            }
+
+            /**
+             * Checks if "Select All" toggle switch needs to be checked/turned-on for each of the selected fields group.
+             * If all possible fields have been selected, then the switch will be turned on, otherwise not.
+             *
+             * @param recoModel                             involved recommendation model (i.e., algorithm)
+             * @param selectedInteractionTypesMap              selected interactions fields
+             * @param selectedInteractionFilterTypes        selected interaction filter fields
+             * @param selectedUserHistoryInteractionTypes   selected user history interactions fields
+             */
+            function checkSelectAllSwitchesStates(
+                recoModel,
+                selectedInteractionTypesMap,
+                selectedInteractionFilterTypes,
+                selectedUserHistoryInteractionTypes) {
+                if (selectedInteractionTypesMap !== null && selectedInteractionTypesMap.size === interactionTypes.length) {
+                    document.getElementById('selectAllInteractionTypesSwitch_' + recoModel).checked = true;
+                }
+                if (selectedInteractionFilterTypes !== null && selectedInteractionFilterTypes.length === interactionTypes.length) {
+                    if (recoModel === 'UserCbCf') {
+                        document.getElementById('selectAllInteractionFilterTypesSwitch_' + recoModel).checked = true;
+                    } else {
+                        document.getElementById('selectAllInteractionFilterTypesSwitch_Reminders').checked = true;
+                    }
+                }
+                if (selectedUserHistoryInteractionTypes !== null && selectedUserHistoryInteractionTypes.length === interactionTypes.length) {
+                    document.getElementById('selectAllInteractionTypesSwitch_userHistory').checked = true;
+                }
+            }
+
+            /**
+             * If recommendation algorithm has been chosen, adequate html div will be displayed that contains algorithm
+             * specific settings in order to fine-tune the algorithm according to desired recommendation scenario.
+             *
+             * @param algorithm     chosen recommendation algorithm
+             * @param resetValues   boolean flag to reset all model specific settings
+             */
+            function updateModelSpecificSettings(algorithm, resetValues) {
+                if (resetValues) {
+                    makeAllModelSpecificSettingsInvisibleAndResetInputValues();
+                }
+
+                if (algorithmPreconditionsSatisfied(algorithm)) {
+                    document.getElementById('modelSpecificSettingsPlaceholder').hidden = true;
+                    document.getElementById(algorithm).hidden = false;
+                    updateScenarioSettingsAppearance();
+                }
+            }
+
+            /**
+             * On change of any general setting, this method is being called in order to hide all previously presented
+             * model specific settings and to delete any input value that has been written but not submitted/stored
+             * in the database.
+             */
+            function makeAllModelSpecificSettingsInvisibleAndResetInputValues() {
+                document.getElementById('ItemMp').hidden = true;
+                document.getElementById('ItemCb').hidden = true;
+                document.getElementById('ItemHistoryCb').hidden = true;
+                document.getElementById('InteractionCf').hidden = true;
+                document.getElementById('ContextInteractionCf').hidden = true;
+                document.getElementById('UserCbCf').hidden = true;
+                document.getElementById('HybridRoundRobinWeightedSum').hidden = true;
+
+                document.getElementById('hybridAvailableProfilesTable').innerHTML = "";
+
+                document.getElementById('selectAllInteractionTypesSwitch_ItemMp').checked = false;
+                document.getElementById('selectAllInteractionTypesSwitch_InteractionCf').checked = false;
+                document.getElementById('selectAllInteractionTypesSwitch_ContextInteractionCf').checked = false;
+
+                document.getElementById('selectAllInteractionTypesSwitch_userHistory').checked = false;
+
+                document.getElementById('selectAllInteractionFilterTypesSwitch_Reminders').checked = false;
+                document.getElementById('selectAllInteractionFilterTypesSwitch_UserCbCf').checked = false;
+
+                for (const e of document.getElementsByName('interactionTypes')) {
+                    e.checked = false;
+                }
+                for (const e of document.getElementsByName('interactionFilterTypes')) {
+                    e.checked = false;
+                }
+
+                for (const e of document.getElementsByName('userHistoryInteractionTypes')) {
+                    e.checked = false;
+                }
+
+                for (const e of document.getElementsByName('mltMaxResults')) {
+                    e.value = "";
+                }
+
+                for (const e of document.getElementsByName('mltMaxqt')) {
+                    e.value = "";
+                }
+
+                for (const e of document.getElementsByName('mltMindf')) {
+                    e.value = "";
+                }
+
+                for (const e of document.getElementsByName('mltMintf')) {
+                    e.value = "";
+                }
+
+                for (const e of document.getElementsByName('mltMinwl')) {
+                    e.value = "";
+                }
+
+                for (const e of document.getElementsByName('boostField')) {
+                    e.selectedIndex = 0;
+                }
+
+                for (const e of document.getElementsByName('boostValue')) {
+                    e.value = "";
+                }
+
+                for (const e of document.getElementsByName('useBll')) {
+                    e.checked = false;
+                }
+
+                document.getElementById('refCbProfileSelect').selectedIndex = 0;
+                document.getElementById('recentDayCount').value = "";
+                document.getElementById('similarItemsCount').value = "";
+                document.getElementById('remindersSwitch').checked = false;
+                document.getElementById('fetchFromInteractionsCoreSwitch').checked = false;
+                document.getElementById('userHistoryInteractionsCountInputTable').hidden = true;
+                document.getElementById('userHistoryInteractionsCountInput').value = "";
+                document.getElementById('itemContextSwitch').disabled = false;
+                document.getElementById('businessRulesDiv').hidden = false;
+                document.getElementById('userHistoryDiv').hidden = false;
+                document.getElementById('remindersDiv').hidden = false;
+
+                let filterQueryButton = document.getElementById('filterQuery');
+                filterQueryButton.checked = false;
+                filterQueryCheckboxChange(filterQueryButton);
+            }
+
+            /**
+             * Checks if all required fields for observed recommendations algorithm exist.
+             * Throws warnings in case some fields are missing or not defined at all.
+             */
+            function algorithmPreconditionsSatisfied(algo) {
+                if (algo === 'ItemMp' || algo === 'InteractionCf' || algo === 'ContextInteractionCf') {
+                    if (globalThis.interactionTypes === null || globalThis.interactionTypes.length === 0) {
+                        document.getElementById('noInteractionTypesWarning').hidden = false;
+                        return false;
+                    }
+                } else if (algo === 'ItemCb' || algo === 'ItemHistoryCb') {
+                    let recoOption = document.getElementById('recoOptionSelect');
+                    let recoObject = recoOption.value.split(";")[0];
+                    let recoEntity = recoOption.value.split(";")[1];
+
+                    let freeTextFields;
+                    if (recoObject === 'items') {
+                        try {
+                            freeTextFields = new Map(Object.entries(globalThis.itemsEntityFieldsMap.get(recoEntity))).get('Free Text');
+                        } catch (error) {
+                            freeTextFields = undefined;
+                        }
+                    } else {
+                        try {
+                            freeTextFields = new Map(Object.entries(globalThis.usersEntityFieldsMap.get(recoEntity))).get('Free Text');
+                        } catch (error) {
+                            freeTextFields = undefined;
+                        }
+                    }
+
+                    if (freeTextFields === undefined || freeTextFields.length === 0) {
+                        document.getElementById('noFreeTextFieldsWarning').hidden = false;
+                        return false;
+                    }
+                    if (globalThis.interactionTypes === null || globalThis.interactionTypes.length === 0) {
+                        document.getElementById('noInteractionTypesWarning').hidden = false;
+                        return false;
+                    }
+                } else if (algo === 'UserCbCf') {
+                    if (globalThis.cbProfilesMap === null || globalThis.cbProfilesMap.size === 0) {
+                        document.getElementById('noCbRefScenarioWarning').hidden = false;
+                        return false;
+                    }
+                }
+                return true;
+            }
+
+            /**
+             * Function which is responsible for selecting/deselecting all interaction types depending on the
+             * trigger object. Function is handling INTERACTION TYPES and INTERACTION FILTER TYPES for all algorithms.
+             *
+             * @param triggerObject trigger object of this function (e.g. one of the Select All switches)
+             * @param group         group in which the switch is being located at together with related checkbox buttons
+             */
+            function selectAll(triggerObject, group) {
+                const updateWeightInputAppearance =  ['InteractionCf', 'ContextInteractionCf'];
+
+                if (triggerObject.id === 'selectAllInteractionTypesSwitch_' + group) {
+                    if (group === 'userHistory') {
+                        let interactionTypes = document.getElementsByName('userHistoryInteractionTypes');
+                        interactionTypes.forEach(function (e) {
+                            e.checked = triggerObject.checked;
+                        });
+                    } else {
+                        let interactionTypes = document.getElementsByName('interactionTypes');
+                        interactionTypes.forEach(function (e) {
+                            if (e.id.split('_')[1] === group) {
+                                e.checked = triggerObject.checked;
+                                if (updateWeightInputAppearance.includes(group)) {
+                                    updateInteractionTypeWeightInputAppearance(e);
+                                }
+                            }
+                        });
+                    }
+                } else {
+                    let interactionFilterTypes = document.getElementsByName('interactionFilterTypes');
+                    interactionFilterTypes.forEach(function (e) {
+                        if (e.id.split('_')[1] === group) {
+                            e.checked = triggerObject.checked;
+                        }
+                    });
+                }
+            }
+
+            /**
+             * This function propagates its checked state towards "Select All" button of related
+             * interaction filter types group.
+             *
+             * @param triggerObject "Reminders" toggle button
+             */
+            function remindersChecked(triggerObject) {
+                let selectAllReminders = document.getElementById('selectAllInteractionFilterTypesSwitch_Reminders');
+                selectAllReminders.checked = triggerObject.checked;
+                selectAll(selectAllReminders, 'Reminders');
+            }
+
+            /**
+             * Builds dropdown menu for MLT booster fields to select.
+             * Only "Free Text" fields are presented if they exist.
+             * In case recommendation entity is not the same as reco location, intersection free text fields will be
+             * offered if they exist. Otherwise, in case reco entity & reco location are exactly the same, all free text
+             * fields are going to be presented.
+             *
+             */
+            function updateMltBoostersAppearance() {
+                const relevantAlgos = ['ItemCb', 'ItemHistoryCb'];
+
+                let recoOption = document.getElementById('recoOptionSelect').value;
+                let itemContext = document.getElementById('itemContextSelect').value;
+
+                let recoObject = recoOption.split(";")[0];
+                let recoEntity = recoOption.split(";")[1];
+
+                let recoModel;
+                if (recoObject === 'items') {
+                    recoModel = document.getElementById('itemsAlgos').value;
+                } else {
+                    recoModel = document.getElementById('usersAlgos').value;
+                }
+
+                if (!recoObject || !recoModel || !relevantAlgos.includes(recoModel)) {
+                    return;
+                }
+
+                let itemsFreeTextAttributesSelect = document.getElementById('itemsFreeTextAttributes_' + recoModel);
+                let usersFreeTextAttributesSelect = document.getElementById('usersFreeTextAttributes_' + recoModel);
+
+                let freeTextFields;
+                let freeTextAttributesSelect;
+                if (recoObject === 'items') {
+                    usersFreeTextAttributesSelect.style.display = "none";
+                    usersFreeTextAttributesSelect.selectedIndex = 0;
+
+                    freeTextAttributesSelect = itemsFreeTextAttributesSelect;
+
+                    let recoEntityFreeTextFields;
+                    let itemContextFreeTextFields;
+                    try {
+                        recoEntityFreeTextFields = new Map(Object.entries(globalThis.itemsEntityFieldsMap.get(recoEntity))).get('Free Text');
+                    } catch (error) {
+                        recoEntityFreeTextFields = new Map();
+                    }
+                    try {
+                        itemContextFreeTextFields = new Map(Object.entries(globalThis.itemsEntityFieldsMap.get(itemContext))).get('Free Text');
+                    } catch (error) {
+                        itemContextFreeTextFields = new Map();
+                    }
+
+                    if (itemContextFreeTextFields !== null && itemContextFreeTextFields.length > 0) {
+                        freeTextFields = getIntersectionFreeTextFields(recoEntityFreeTextFields, itemContextFreeTextFields);
+                    } else {
+                        freeTextFields = recoEntityFreeTextFields;
+                    }
+                } else {
+                    itemsFreeTextAttributesSelect.style.display = "none";
+                    itemsFreeTextAttributesSelect.selectedIndex = 0;
+
+                    freeTextAttributesSelect = usersFreeTextAttributesSelect;
+                    let recoEntityFreeTextFields;
+                    let itemContextFreeTextFields;
+                    try {
+                        recoEntityFreeTextFields = new Map(Object.entries(globalThis.usersEntityFieldsMap.get(recoEntity))).get('Free Text');
+                    } catch (error) {
+                        recoEntityFreeTextFields = new Map();
+                    }
+                    try {
+                        itemContextFreeTextFields = new Map(Object.entries(globalThis.usersEntityFieldsMap.get(itemContext))).get('Free Text');
+                    } catch (error) {
+                        itemContextFreeTextFields = new Map();
+                    }
+
+                    if (itemContextFreeTextFields !== null && itemContextFreeTextFields.length > 0) {
+                        freeTextFields = getIntersectionFreeTextFields(recoEntityFreeTextFields, itemContextFreeTextFields);
+                    } else {
+                        freeTextFields = recoEntityFreeTextFields;
+                    }
+                }
+                updateMltSelectOptionsToShow(freeTextAttributesSelect, freeTextFields);
+            }
+
+            /**
+             * Retrieves an intersection between submitted array lists of text fields.
+             *
+             * @param freeTextFields1   first array list of free text fields
+             * @param freeTextFields2   second array list of free text fields
+             */
+            function getIntersectionFreeTextFields(freeTextFields1, freeTextFields2) {
+                let intersection = [];
+                for (const [i, field1] of Object.entries(freeTextFields1)) {
+                    for (const [j, field2] of Object.entries(freeTextFields2)) {
+                        if (field1.name === field2.name && !intersection.includes(field1)) {
+                            intersection.push(field1);
+                        }
+                    }
+                }
+                return intersection;
+            }
+
+            /**
+             * Depending on the chosen entity and reco location, the related set of Free Text fields is being presented
+             * within the MLT attribute dropdown menu.
+             *
+             * @param entityAttributesSelectToShow  html select object which is being updated with related values
+             * @param freeTextFields                list of "Free Text" fields for chosen entity and reco location
+             */
+            function updateMltSelectOptionsToShow(entityAttributesSelectToShow, freeTextFields) {
+                let str = '<option value=\"\" selected disabled hidden>Choose Attribute</option>';
+
+                if (freeTextFields !== undefined && freeTextFields.length > 0) {
+                    str += "<optgroup label=\"" + "Free Text" + "\">";
+
+                    for (let field of freeTextFields) {
+                        str += "<option>" + field.name + "</option>";
+                    }
+                }
+
+                entityAttributesSelectToShow.innerHTML = str;
+                entityAttributesSelectToShow.style.display = "block";
+            }
+
+            /**
+             * This function fills reference ItemCb recommendation profile dropdown select option html object with
+             * proper values. That is, from a predefined cbProfilesMap in the view controller, existing and already
+             * defined ItemCb profiles for observed domain will be placed in separate 'recommendation context' group
+             * based on their reco location values.
+             *
+             * @param triggerRecoLocation reco location value which is triggering this function
+             */
+            function updateRefCbProfilesToShow(triggerRecoLocation) {
+                let str = '<option value=\"\" selected disabled hidden>Choose Profile</option>';
+
+                for (const [itemContext, profiles] of globalThis.cbProfilesMap) {
+                    if (profiles.length > 0) {
+                        str += "<optgroup label=\"" + itemContext + "\">"
+                        for (let profile of profiles) {
+                            if (globalThis.refCbScenarioId !== null && globalThis.refCbScenarioId === profile.id) {
+                                str += "<option id=\"" + itemContext + ";" + profile.name + "\"" + " value=\"" + profile.id + "\"" + " selected>" + profile.name + "</option>";
+                            } else {
+                                str += "<option id=\"" + itemContext + ";" + profile.name + "\"" + " value=\"" + profile.id + "\">" + profile.name + "</option>";
+                            }
+                        }
+                    }
+                }
+                let refCbProfileSelect = document.getElementById('refCbProfileSelect');
+                refCbProfileSelect.innerHTML = str;
+            }
+
+            /**
+             * Checks and updates a "Select All" switch button state if all checkbox buttons in observed group have been checked.
+             *
+             * @param triggerButton trigger checkbox button
+             */
+            function updateRelatedSelectAllSwitch(triggerButton) {
+                /*<![CDATA[*/
+                var interactionTypes = /*[[${interactionTypes}]]*/ null;
+                /*]]>*/
+
+                let totalNumberOfButtons = interactionTypes.length;
+
+                let groupCategory = triggerButton.id.split('_')[0];
+                let groupCategoryAlgo = triggerButton.id.split('_')[1];
+
+                let numberOfChecked = 0;
+                for (const e of interactionTypes) {
+                    let buttonId = groupCategory + '_' + groupCategoryAlgo + '_' + e.name;
+                    if (document.getElementById(buttonId).checked) {
+                        numberOfChecked += 1;
+                    }
+                }
+
+                if (groupCategory === 'interactionType') {
+                    if (numberOfChecked === totalNumberOfButtons) {
+                        document.getElementById('selectAllInteractionTypesSwitch_' + groupCategoryAlgo).checked = true;
+                    } else {
+                        document.getElementById('selectAllInteractionTypesSwitch_' + groupCategoryAlgo).checked = false;
+                    }
+                } else {
+                    if (numberOfChecked === totalNumberOfButtons) {
+                        document.getElementById('selectAllInteractionFilterTypesSwitch_' + groupCategoryAlgo).checked = true;
+                    } else {
+                        document.getElementById('selectAllInteractionFilterTypesSwitch_' + groupCategoryAlgo).checked = false;
+                    }
+                }
+            }
+
+            /**
+             * When "Filter Query" checkbox is clicked, this method is called and related business rule block of html
+             * elements is displayed.
+             */
+            function filterQueryCheckboxChange(obj) {
+                let filterQueryForm = document.getElementById("filterQueryForm");
+                let filterQueryFormSettings = document.getElementById("filterQueryFormSettings");
+
+                if (obj.id === 'filterQuery' && obj.checked === true) {
+                    filterQueryForm.style.display = "block";
+                    filterQueryFormSettings.style.display = "block";
+                } else {
+                    let itemsEntityAttributes = document.getElementById("itemsEntityAttributes");
+                    let usersEntityAttributes = document.getElementById("usersEntityAttributes");
+                    let value = document.getElementById("valueInputField");
+                    let valueFrom = document.getElementById("valueFromInputField");
+                    let valueTo = document.getElementById("valueToInputField");
+
+                    let excludeSwitch = document.getElementById("excludeSwitch");
+                    let rangeSwitch = document.getElementById("rangeSwitch");
+
+                    document.getElementById('rangeSwitchDiv').style.display = "none";
+                    document.getElementById('rangeValueInput').style.display = "none";
+                    document.getElementById('valueInput').style.display = "block";
+
+                    filterQueryForm.style.display = "none";
+                    filterQueryFormSettings.style.display = "none";
+
+                    itemsEntityAttributes.selectedIndex = 0;
+                    usersEntityAttributes.selectedIndex = 0;
+                    value.value = "";
+                    valueFrom.value = "";
+                    valueTo.value = "";
+                    excludeSwitch.checked = false;
+                    rangeSwitch.checked = false;
+                }
+            }
+
+            /**
+             * Entry point when recommendation option has been chosen.
+             */
+            function updateFilterQuery(triggerObject) {
+                let recoObject = triggerObject.value.split(";")[0];
+                let recoEntity = triggerObject.value.split(";")[1];
+                updateFilterQueryAppearance(recoObject, recoEntity);
+            }
+
+            /**
+             * Function responsible for arrangement of adequate Filter Query elements
+             * (e.g. correct entity fields loaded if they exist, disable otherwise and display tooltip with info icon).
+             */
+            function updateFilterQueryAppearance(recoObject, recoEntity) {
+                if (recoObject === null && recoEntity === null) {
+                    initializeFilterQueryCheckboxButton();
+                } else {
+                    let itemsEntityAttributesSelect = document.getElementById('itemsEntityAttributes');
+                    let usersEntityAttributesSelect = document.getElementById('usersEntityAttributes');
+                    if (recoObject === 'items') {
+                        usersEntityAttributesSelect.style.display = "none";
+                        usersEntityAttributesSelect.selectedIndex = 0;
+
+                        let itemsEntityFieldsMap = globalThis.itemsEntityFieldsMap.get(recoEntity);
+                        if (itemsEntityFieldsMap === undefined) {
+                            disableFilterQueryCheckboxButton();
+                        } else {
+                            enableFilterQueryCheckboxButton();
+                            updateFilterQueryFormToShow(itemsEntityAttributesSelect, itemsEntityFieldsMap);
+                        }
+                    } else {
+                        itemsEntityAttributesSelect.style.display = "none";
+                        itemsEntityAttributesSelect.selectedIndex = 0;
+
+                        let usersEntityFieldsMap = globalThis.usersEntityFieldsMap.get(recoEntity);
+                        if (usersEntityFieldsMap === undefined) {
+                            disableFilterQueryCheckboxButton();
+                        } else {
+                            enableFilterQueryCheckboxButton();
+                            updateFilterQueryFormToShow(usersEntityAttributesSelect, usersEntityFieldsMap);
+                        }
+                    }
+                }
+            }
+
+            /**
+             * Initializes "Filter Query" checkbox button and disables it.
+             */
+            function initializeFilterQueryCheckboxButton() {
+                let filterQuery = document.getElementById("filterQuery");
+                let filterQueryLabel = document.getElementById('filterQueryLabel');
+                let tooltipSpan = document.getElementById("tooltipSpan");
+
+                tooltipSpan.title = "";
+                filterQuery.disabled = true;
+                filterQueryLabel.innerHTML = 'Filter Query';
+            }
+
+            /**
+             * Disables the "Filter Query" checkbox button and adds a tooltip with an info icon in case chosen entity
+             * does not have any field defined.
+             */
+            function disableFilterQueryCheckboxButton() {
+                let filterQuery = document.getElementById("filterQuery");
+                let filterQueryForm = document.getElementById("filterQueryForm");
+                let filterQueryFormSettings = document.getElementById("filterQueryFormSettings");
+                let filterQueryLabel = document.getElementById('filterQueryLabel');
+                let tooltipSpan = document.getElementById("tooltipSpan");
+
+                filterQuery.checked = false;
+                filterQuery.disabled = true;
+                filterQueryLabel.innerHTML = 'Filter Query <i class="bi bi-info-circle"></i>';
+                tooltipSpan.title = 'No fields defined for observed entity';
+                filterQueryForm.style.display = "none";
+                filterQueryFormSettings.style.display = "none";
+            }
+
+            /**
+             * Enables Filter Query checkbox button and removes tooltip.
+             */
+            function enableFilterQueryCheckboxButton() {
+                let filterQuery = document.getElementById("filterQuery");
+                let filterQueryLabel = document.getElementById('filterQueryLabel');
+                let tooltipSpan = document.getElementById("tooltipSpan");
+
+                tooltipSpan.title = "";
+                filterQuery.disabled = false;
+                filterQueryLabel.innerHTML = 'Filter Query';
+            }
+
+            /**
+             * Depending on the chosen entity, the related set of fields is being presented within a Filter Query
+             * attribute dropdown menu together with related field types as separator groups.
+             *
+             * @param entityAttributesSelectToShow  html select object which is being updated with related values
+             * @param entityFieldsMap               map of related fields to chosen entity
+             */
+            function updateFilterQueryFormToShow(entityAttributesSelectToShow, entityFieldsMap) {
+                let str = '<option value=\"\" selected disabled hidden>Choose Attribute</option>';
+
+                for (const [fieldType, fields] of Object.entries(entityFieldsMap)) {
+                    if (fieldType !== 'Free Text' && fields.length > 0) {
+                        str += "<optgroup label=\"" + fieldType + "\">";
+                        for (let field of fields) {
+                            str += "<option id=\"" + fieldType + ";" + field.name + "\">" + field.name + "</option>";
+                        }
+                    }
+                }
+
+                entityAttributesSelectToShow.innerHTML = str;
+                entityAttributesSelectToShow.style.display = "block";
+            }
+
+            /**
+             * This function is responsible for hiding/presenting adequate input based on range switch being checked or not.
+             *
+             * @param rangeSwitch range switch triggering this function call
+             */
+            function updateBusinessRuleValueInput(rangeSwitch) {
+                let valueInput = document.getElementById('valueInput');
+                let rangeValueInput = document.getElementById('rangeValueInput');
+
+                if (rangeSwitch.checked) {
+                    valueInput.style.display = "none";
+                    document.getElementById('valueInputField').value = "";
+
+                    rangeValueInput.style.display = "block";
+                } else {
+                    rangeValueInput.style.display = "none";
+                    document.getElementById('valueFromInputField').value = "";
+                    document.getElementById('valueToInputField').value = "";
+
+                    valueInput.style.display = "block";
+                }
+            }
+
+            /**
+             * Based on the chosen option in Business Rule dropdown menu, only for "Numeric" and "Date" option types
+             * should be possible to set the value in range.
+             *
+             * @param triggerSelect complete select element with chosen field for business rule attribute
+             */
+            function adaptValueRangeAppearance(triggerSelect) {
+                let fieldType = triggerSelect.options[triggerSelect.selectedIndex].id.split(';')[0];
+
+                let rangeSwitchDiv = document.getElementById('rangeSwitchDiv');
+                let rangeSwitch = document.getElementById('rangeSwitch');
+
+                let valueInput = document.getElementById('valueInput');
+                let rangeValueInput = document.getElementById('rangeValueInput');
+
+                let valueInputField = document.getElementById('valueInputField');
+                let valueFromInputField = document.getElementById('valueFromInputField');
+                let valueToInputField = document.getElementById('valueToInputField');
+
+                rangeSwitch.checked = false;
+                valueInputField.value = "";
+                valueFromInputField.value = "";
+                valueToInputField.value = "";
+
+                if (fieldType === 'Numeric' || fieldType === 'Date') {
+                    rangeSwitchDiv.style.display = "block";
+                    valueInput.style.display = "block";
+
+                    rangeValueInput.style.display = "none";
+                } else {
+                    rangeSwitchDiv.style.display = "none";
+                    rangeValueInput.style.display = "none";
+
+                    valueInput.style.display = "block";
+                }
+            }
+
+            /**
+             * Updates related info icon title in order to present the adequate information about the chosen strategy.
+             *
+             * @param strategy chosen result strategy
+             */
+            function updateItemCbResultStrategyInfoIcon(strategy) {
+                const roundRobinSkipItemStrategyInfo = 'This strategy uses as much given context items as set in "max context items" to find similar items.';
+                const firstItemStrategyInfo = 'This strategy uses only the first item of provided context items to find similar items.';
+
+                let itemCbResultStrategyInfoIcon = document.getElementById('itemCbResultStrategyInfoIcon');
+                if (strategy === 'firstItem') {
+                    itemCbResultStrategyInfoIcon.title = firstItemStrategyInfo;
+                } else {
+                    itemCbResultStrategyInfoIcon.title = roundRobinSkipItemStrategyInfo;
+                }
+            }
+
+            /**
+             * Updates related info icon title in order to present the adequate information about the chosen strategy.
+             *
+             * @param strategy chosen result strategy
+             */
+            function updateItemHistoryCbResultStrategyInfoIcon(strategy) {
+                const roundRobinSkipItemStrategyInfo = 'This strategy fetches similar items (starting with the target item) for the set amount of items in the user\'s history.\n' +
+                    'Alternatively takes from each result list items to put into the final result list (and jumps to the next item in a particular result list if its already contained in the final result list).';
+                const fillUpStrategyInfo = 'This strategy fetches similar items (starting with the target item) for each item in the user\'s history as long as the result list is full.\n' +
+                    'Fills up the result list completely for, e.g., the first history item, if it can provide total number of recommendations.\n' +
+                    'This results in only one mlt call most the times, as with the target item enough similar items can found already.';
+
+                let itemHistoryCbResultStrategyInfoIcon = document.getElementById('itemHistoryCbResultStrategyInfoIcon');
+                if (strategy === 'fillUp') {
+                    itemHistoryCbResultStrategyInfoIcon.title = fillUpStrategyInfo;
+                } else {
+                    itemHistoryCbResultStrategyInfoIcon.title = roundRobinSkipItemStrategyInfo;
+                }
+            }
+
+            /**
+             * Updates input field appearance for number of interactions to take into account for each interaction type
+             * in case toggle button for fetching user history based on interacions core was selected/deselected.
+             *
+             * @param fetchFromInteractionsCore toggle button state (e.g. true/false)
+             */
+            function updateUserHistoryInteractionsCountInputAppearance(fetchFromInteractionsCore) {
+                const fetchUserHistoryBasedOnInteractionsOn = 'Fetch items from user history user has interacted with taking into account only the selected interaction types.\n' +
+                    'Number of interactions to take into account for each interaction type will dictate which most recent and relevant items will be included into user history.';
+                const fetchUserHistoryBasedOnInteractionsOff = 'Fetch items from user history user has interacted with taking into account only the selected interaction types regardless when these interactions took place in time. That is, items from all selected interaction types will be included.';
+
+                let fetchUserHistoryBasedOnInteractionsCoreInfoIcon = document.getElementById('fetchUserHistoryBasedOnInteractionsCoreInfoIcon')
+                let userHistoryInteractionsCountInputTable = document.getElementById('userHistoryInteractionsCountInputTable');
+                let userHistoryInteractionsCountInput = document.getElementById('userHistoryInteractionsCountInput');
+
+                if (fetchFromInteractionsCore) {
+                    userHistoryInteractionsCountInputTable.hidden = false;
+                    fetchUserHistoryBasedOnInteractionsCoreInfoIcon.title = fetchUserHistoryBasedOnInteractionsOn;
+                } else {
+                    fetchUserHistoryBasedOnInteractionsCoreInfoIcon.title = fetchUserHistoryBasedOnInteractionsOff;
+                    userHistoryInteractionsCountInputTable.hidden = true;
+                    userHistoryInteractionsCountInput.value = "";
+                }
+            }
+        </script>
+
+        <!-- Scenario settings delete Modal -->
+        <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="deleteModalLabel">Reset scenario?</h5>
+                    </div>
+                    <div class="modal-body">
+                        Are you sure you want to change the scenario settings?
+                        All defined scenario settings will be deleted. Consequences of this action can not be undone!
+                    </div>
+                    <div class="modal-footer">
+                        <input class="btn btn-danger" type="submit" name="action" value="Reset"
+                               onclick="document.getElementById('itemContextSwitch').checked = false;">
+                        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal"
+                                onclick="window.location.reload();">
+                            Cancel
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <script th:inline="javascript">
+            /**
+             * Function which will trigger a modal responsible for deleting any existing setting previously
+             * defined for observed recommendation scenario.
+             * That is, if user changes any of the crucial general settings (e.g. reco object and/or reco entity,
+             * recommendation algorithm or any related specific setting which changes the general scenario context),
+             * all the previously stored and configured settings will be deleted.
+             *
+             * @param triggerObject object that triggers this action (e.g. recoModelSelect)
+             */
+            function resetScenarioWarningModal(triggerObject) {
+                /*<![CDATA[*/
+                let businessRules = /*[[${businessRules}]]*/ null;
+                let mltBoosters = /*[[${mltBoosters}]]*/ null;
+
+                let mltMaxResults = /*[[${mltMaxResults}]]*/ null;
+                let mltMaxqt = /*[[${mltMaxqt}]]*/ null;
+                let mltMindf = /*[[${mltMindf}]]*/ null;
+                let mltMintf = /*[[${mltMintf}]]*/ null;
+                let mltMinwl = /*[[${mltMinwl}]]*/ null;
+
+                let selectedInteractionFilterTypes = /*[[${selectedInteractionFilterTypes}]]*/ null;
+                let selectedResultStrategy = /*[[${selectedResultStrategy}]]*/ null;
+                let fetchFromInteractionsCore = /*[[${fetchFromInteractionsCore}]]*/ null;
+                let selectedHybridInterruptAlgos = /*[[${selectedHybridInterruptAlgos}]]*/ null;
+
+                var selectedInteractionTypesMap = /*[[${selectedInteractionTypesMap}]]*/ null;
+
+                if (selectedInteractionTypesMap !== null) {
+                    selectedInteractionTypesMap = new Map(Object.entries(selectedInteractionTypesMap));
+                }
+
+                var selectedHybridPropertiesMap = /*[[${selectedHybridPropertiesMap}]]*/ null;
+
+                if (selectedHybridPropertiesMap !== null) {
+                    selectedHybridPropertiesMap = new Map(Object.entries(selectedHybridPropertiesMap));
+                }
+                /*]]>*/
+
+                if ((businessRules !== null && businessRules.length > 0) ||
+                    (mltBoosters !== null && mltBoosters.length > 0) ||
+                    (mltMaxResults !== null || mltMaxqt !== null || mltMindf !== null || mltMintf !== null || mltMinwl !== null) ||
+                    (selectedInteractionTypesMap !== null && selectedInteractionTypesMap.size > 0) ||
+                    (selectedInteractionFilterTypes !== null && selectedInteractionFilterTypes.length > 0) ||
+                    (selectedHybridPropertiesMap !== null && selectedHybridPropertiesMap.size > 0) ||
+                    (selectedResultStrategy !== null) ||
+                    (fetchFromInteractionsCore !== null) ||
+                    (selectedHybridInterruptAlgos !== null)) {
+                    let resetScenarioModal = new bootstrap.Modal(
+                        document.getElementById('deleteModal'), {backdrop: 'static', keyboard: false});
+                    resetScenarioModal.show();
+                }
+            }
+        </script>
+    </form>
+</div>
+</body>
+</html>

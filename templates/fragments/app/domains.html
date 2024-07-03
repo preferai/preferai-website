@@ -1,0 +1,59 @@
+<!DOCTYPE HTML>
+<html xmlns:th="https://www.thymeleaf.org">
+<head>
+</head>
+<body>
+<div th:fragment="domains">
+
+    <h1>Add new domain</h1>
+
+    <br/>
+
+    <br th:if="${domainExists} or ${invalidDomain}">
+
+    <div th:if="${domainExists}" class="alert alert-danger alert-dismissible fade show" role="alert">
+        <strong><i class="bi bi-exclamation-triangle-fill"></i> Error!</strong> Domain already exists!
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+    <div th:if="${invalidDomain}" class="alert alert-danger alert-dismissible fade show" role="alert">
+        <strong><i class="bi bi-exclamation-triangle-fill"></i> Error!</strong> Domain name must not be empty!
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+
+
+    <form action="#" th:action="@{/storeDomain}" method="POST">
+        <table style="border-collapse: separate; -webkit-border-horizontal-spacing: 10px;">
+            <tr>
+                <td><label>Name</label></td>
+                <td><input type="text" class="form-control float-end" name="domainName"></td>
+                <td><input class="btn sbtn" type="submit" value="Create"></td>
+            </tr>
+            <tr th:if="not ${domains.isEmpty()}">
+                <table  style="margin-left: 10px; margin-top: 10px;">
+                    <tr>
+                        <td><label>Choose an existing domain if you want to replicate it:</label></td>
+                        <td style="padding-left: 10px">
+                            <div th:each="d: ${domains}" class="form-check form-check-inline" style="padding-left: 0">
+                                <input type="checkbox" class="btn-check" name="domainToCopy" th:id="${d.name}" th:value="${d.name}" onclick="cbChange(this)">
+                                <label class="btn btn-outline-primary" th:for="${d.name}" th:text="${d.name}"></label>
+                            </div>
+                        </td>
+                    </tr>
+                </table>
+            </tr>
+        </table>
+    </form>
+
+    <script th:inline="javascript">
+        function cbChange(obj) {
+            let cbs = document.getElementsByClassName("btn-check");
+            for (let i = 0; i < cbs.length; i++) {
+                if (cbs[i].id !== obj.id) {
+                    cbs[i].checked = false;
+                }
+            }
+        }
+    </script>
+</div>
+</body>
+</html>

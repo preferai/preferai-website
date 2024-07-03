@@ -1,0 +1,119 @@
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head>
+</head>
+<body>
+<div th:fragment="app">
+
+    <div class="row flex-nowrap">
+
+        <div class="col-2 px-1 position-fixed"
+             style="margin-top: 80px; position: fixed; background-color: #d7dad0;">
+             <!--  background: linear-gradient( 180deg, rgba(44, 72, 182, 1) 15%, rgba(122, 240, 201, 1) 100% );"> -->
+
+            <div th:replace="fragments/app-sidebar :: app-sidebar"/>
+        </div>
+
+        <div class="col-10 offset-2" style="padding-top: 100px;">
+
+            <div class="row fb">
+                <nav style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item" th:classappend="${view == null} ? active">
+                            <a href="/user">
+                                <i class="bi-grid" aria-hidden="true"></i>
+                                Domains
+                            </a>
+                        </li>
+                        <li class="breadcrumb-item" th:if="${domain != null}">
+                            <a th:href="@{/user(view='catalog', domain=${domain})}">
+                                <i class="bi bi-pip"></i>
+                                <span th:text="${domain}"></span>
+                            </a>
+                        </li>
+                        <li th:if="${view == 'domains'}" class="breadcrumb-item active" aria-current="page">
+                            <i class="bi bi-plus-square"></i>
+                            Add Domain
+                        </li>
+                        <li th:if="${view == 'kpi'}" class="breadcrumb-item active" aria-current="page">
+                            <i class="bi-graph-up"></i>
+                            KPI
+                        </li>
+                        <li th:if="${view == 'engine'}" class="breadcrumb-item active" aria-current="page">
+                            <i class="bi-gear"></i>
+                            Personalization Engine
+                        </li>
+                        <li th:if="${view == 'api-reference'}" class="breadcrumb-item active" aria-current="page">
+                            <i class="bi bi-journal-text"></i>
+                            API Reference
+                        </li>
+                        <li th:if="${view == 'custom'}" class="breadcrumb-item active" aria-current="page">
+                            <i class="bi bi-pencil-square"></i>
+                            Custom Scenario
+                        </li>
+                        <li th:if="${view == 'catalog'}" class="breadcrumb-item active" aria-current="page">
+                            <i class="bi bi-card-list"></i>
+                            Data Catalog
+                        </li>
+                        <li th:if="${view == 'items'}" class="breadcrumb-item active" aria-current="page">
+                            <i class="bi bi-card-list"></i>
+                            Data Catalog - Items
+                        </li>
+                        <li th:if="${view == 'interactions'}" class="breadcrumb-item active" aria-current="page">
+                            <i class="bi bi-card-list"></i>
+                            Data Catalog - Interactions
+                        </li>
+                        <li th:if="${view == 'users'}" class="breadcrumb-item active" aria-current="page">
+                            <i class="bi bi-card-list"></i>
+                            Data Catalog - Users
+                        </li>
+                    </ol>
+                </nav>
+
+            </div>
+
+            <div th:if="${view == 'welcome'}">
+                <div th:replace="fragments/app/welcome :: welcome"/>
+            </div>
+
+            <div th:if="${view == 'domains'}">
+                <div th:replace="fragments/app/domains :: domains"/>
+            </div>
+
+            <div th:if="${view == 'kpi'}">
+                <div th:replace="fragments/app/dashboard :: dashboard"/>
+            </div>
+
+            <div th:if="${view == 'engine'}">
+                <div th:replace="fragments/app/engine :: engine"/>
+            </div>
+
+            <div th:if="${view == 'api-reference'}">
+                <div th:replace="fragments/app/api-reference :: api-reference"/>
+            </div>
+
+            <div th:if="${view == 'custom'}">
+                <div th:replace="fragments/app/engine_custom :: custom"/>
+            </div>
+
+            <div th:if="${view == 'catalog'}">
+                <div th:replace="fragments/app/catalog :: catalog"/>
+            </div>
+
+            <div th:if="${view == 'items'}">
+                <div th:replace="fragments/app/catalog_items :: items"/>
+            </div>
+
+            <div th:if="${view == 'interactions'}">
+                <div th:replace="fragments/app/catalog_interactions :: interactions"/>
+            </div>
+
+            <div th:if="${view == 'users'}">
+                <div th:replace="fragments/app/catalog_users :: users"/>
+            </div>
+
+        </div>
+    </div>
+
+</div>
+</body>
+</html>

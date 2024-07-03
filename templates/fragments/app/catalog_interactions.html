@@ -1,0 +1,378 @@
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head>
+</head>
+<body>
+<div th:fragment="interactions">
+
+    <br>
+
+    <div th:if="${catalogConfigurationEnabled}">
+
+        <div>
+            <div class="card text-dark gch mb-3">
+                <div class="card-body">
+                    <h5 class="card-title fb">Interaction Types</h5>
+                    <p class="card-text">
+                        First we would like from you to define interaction types which can occur in your system.
+                        That is, if a user can purchase some item/product on your platform, typical type which you would
+                        define here is "buy". Also, if you support feedbacks (i.e., ratings) for your items/products, you
+                        would define an interaction type called "rating" with a range of desired rating values (e.g. 1 to 5).
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <br>
+        <h4>Interaction types</h4>
+        <br>
+
+        <table class="table">
+            <thead class="table-secondary">
+            <tr>
+                <th scope="col">Name</th>
+                <th scope="col">Data Type</th>
+                <th scope="col" th:if="${user2UserPossible != null && user2UserPossible == true}">Only User-User</th>
+                <th scope="col">Action</th>
+            </tr>
+            </thead>
+            <tbody>
+                <tr th:each="f: ${interactionTypeFields}">
+                    <form action="#"
+                          th:action="@{/deleteField/{domain}/{field}(domain=${domain},field=${f.name})}"
+                          method="POST">
+                        <td th:value="f.name" th:text="${f.name}"></td>
+                        <td th:value="f.type" th:text="${f.type == 'Numeric'} ? ${f.type} + ' (From ' + ${f.minRating} + ' To ' + ${f.maxRating} + ')' : ${f.type}"></td>
+                        <td th:if="${user2UserPossible != null && user2UserPossible == true}">
+                            <h5 th:if="${f.subtype == null}"><span class="badge bg-secondary">No</span></h5>
+                            <h5 th:if="${f.subtype != null && f.subtype == 'user2user'}"><span class="badge bg-primary">Yes</span></h5>
+                        </td>
+                        <td><button type="submit" name="delete" class="btn btn-outline-danger">Delete</button></td>
+                    </form>
+                </tr>
+                <tr>
+                    <form action="#"
+                          th:action="@{/addField/{domain}/(domain=${domain})}"
+                          method="POST">
+                        <td><input type="text" class="form-control" id="name" name="name"></td>
+                        <td>
+                            <table><tr>
+                                <td>
+                                    <select id="select" name="type" class="form-select"
+                                            onchange="updateTypeCell(this.value)">
+                                        <option value="" selected disabled hidden>Choose Type</option>
+                                        <option th:each="entry: ${dataTypesMap}"
+                                                th:value="${entry.key}"
+                                                th:text="${entry.key}"></option>
+                                    </select>
+                                </td>
+                                <td>
+                                    <div id="ratingRange" style="display: none">
+                                        &nbsp;&nbsp;From <input type="text" id="minRating" name="minRating"> To <input type="text" id="maxRating" name="maxRating">
+                                    </div>
+                                </td>
+                            </tr></table>
+                        </td>
+                        <td th:if="${user2UserPossible != null && user2UserPossible == true}">
+                            <div class="form-check form-switch" id="user2userSwitchDiv">
+                                <input class="form-check-input" type="checkbox" id="user2userSwitch" name="user2user"
+                                       onchange="invertSwitchLabelText(this)">
+                                <label class="form-check-label" for="user2userSwitch" id="user2userSwitchLabel">No</label>
+                            </div>
+                        </td>
+                        <td><button type="submit" class="btn btn-outline-success">Add</button></td>
+                    </form>
+                </tr>
+            </tbody>
+        </table>
+
+        <p th:if="${fieldExists}" class="text-danger">Field already exists!</p>
+        <p th:if="${invalidField}" class="text-danger">Field name must not be empty!</p>
+        <p th:if="${ratingFieldError}" class="text-danger">Invalid combination of values for rating type submitted!</p>
+        <p th:if="${invalidType}" class="text-danger">Field type must not be empty!</p>
+        <p th:if="${invalidSubtype}" class="text-danger">Field subtype must not be empty!</p>
+
+        <script th:inline="javascript">
+            function updateTypeCell(type) {
+                if (type === "Numeric") {
+                    document.getElementById("ratingRange").style.display = "block";
+                    document.getElementById("minRating").value = 1;
+                    document.getElementById("maxRating").value = 5;
+                } else {
+                    document.getElementById("ratingRange").style.display = "none";
+                    document.getElementById("minRating").value = null;
+                    document.getElementById("maxRating").value = null;
+                }
+            }
+
+            function autofillFields(example) {
+                document.getElementById("name").value = example;
+
+                if (example === "rating") {
+                    document.getElementById("ratingRange").style.display = "block";
+
+                    document.getElementById("select").value = "Numeric";
+                    document.getElementById("minRating").value = 1;
+                    document.getElementById("maxRating").value = 5;
+                } else {
+                    document.getElementById("ratingRange").style.display = "none";
+                    document.getElementById("minRating").value = null;
+                    document.getElementById("maxRating").value = null;
+
+                    document.getElementById("select").value = "Categorical Text";
+                }
+            }
+
+            function invertSwitchLabelText(triggerObj) {
+                let switchLabel = document.getElementById("user2userSwitchLabel");
+
+                if (triggerObj.checked) {
+                    switchLabel.innerHTML = "Yes";
+                } else {
+                    switchLabel.innerHTML = "No";
+                }
+            }
+        </script>
+
+        <div class="row">
+            <div class="col-xs-4">
+                <label>Popular interaction types:</label>
+
+                <input type="button" class="btn btn-outline-primary" value="buy" onclick="autofillFields(this.value)">
+                <input type="button" class="btn btn-outline-primary" value="view" onclick="autofillFields(this.value)">
+                <input type="button" class="btn btn-outline-primary" value="click" onclick="autofillFields(this.value)">
+                <input type="button" class="btn btn-outline-primary" value="rating" onclick="autofillFields(this.value)">
+            </div>
+        </div>
+
+        <br><br>
+        <div>
+            <div class="card text-dark gch mb-3">
+                <div class="card-body">
+                    <h5 class="card-title fb">User Types</h5>
+                    <p class="card-text">
+                        Please select which user types do you have in this domain:
+                    </p>
+                    <form action="#"
+                          th:action="@{/saveUserType/{domain}(domain=${domain})}"
+                          method="POST">
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="userTypeOption" value="anonymous" id="anonymous"
+                                   th:checked="${userTypeChecked == 'anonymous'}">
+                            <label class="form-check-label" for="anonymous">
+                                Anonymous Users
+                            </label><br>
+                            <input class="form-check-input" type="radio" name="userTypeOption" value="registered" id="registered"
+                                   th:checked="${userTypeChecked == 'registered'}">
+                            <label class="form-check-label" for="registered">
+                                Registered Users
+                            </label><br>
+                            <input class="form-check-input" type="radio" name="userTypeOption" value="both" id="both"
+                                   th:checked="${userTypeChecked == 'both'}">
+                            <label class="form-check-label" for="both">
+                                Anonymous & Registered Users
+                            </label>
+                        </div>
+                        <button type="submit" class="btn btn-outline-success">Save</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <br>
+        <div>
+            <div class="card text-dark gch mb-3">
+                <div class="card-body">
+                    <h5 class="card-title fb">User-To-User Interactions</h5>
+                    <p class="card-text">
+                        Can your users interact with each other?
+                    </p>
+                    <form action="#"
+                          th:action="@{/saveUserToUserInteraction/{domain}(domain=${domain})}"
+                          method="POST">
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="userToUserOption" value="yes" id="userToUserYes"
+                                   th:checked="${user2user == 'yes'}">
+                            <label class="form-check-label" for="userToUserYes">
+                                Yes
+                            </label><br>
+                            <input class="form-check-input" type="radio" name="userToUserOption" value="no" id="userToUserNo"
+                                   th:checked="${user2user == null}">
+                            <label class="form-check-label" for="userToUserNo">
+                                No
+                            </label>
+                        </div>
+                        <button type="submit" class="btn btn-outline-success">Save</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <br>
+        <div>
+            <div class="card text-dark gch mb-3">
+                <div class="card-body">
+                    <h5 class="card-title fb">Time Tracking</h5>
+                    <p class="card-text">
+                        Do you track the time of your user interactions?
+                    </p>
+                    <form action="#"
+                          th:action="@{/saveTimeTracking/{domain}(domain=${domain})}"
+                          method="POST">
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="timeTrackingOption" value="yes" id="timestampYes"
+                                   th:checked="${timestamp == 'yes'}">
+                            <label class="form-check-label" for="timestampYes">
+                                Yes
+                            </label><br>
+                            <input class="form-check-input" type="radio" name="timeTrackingOption" value="no" id="timestampNo"
+                                   th:checked="${timestamp == null}">
+                            <label class="form-check-label" for="timestampNo">
+                                No
+                            </label>
+                        </div>
+                        <button type="submit" class="btn btn-outline-success">Save</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <br th:if="${catalogConfigurationEnabled}">
+    <h4>Interaction Fields Overview</h4>
+    <br>
+
+    <label>Please note that all <b>items</b> and <b>users</b> involved in user interactions must already exist in the system before the user interaction has happened.</label>
+
+    <br>
+    <br>
+    <table class="table">
+        <thead class="table-secondary">
+            <tr>
+                <th scope="col">Field</th>
+                <th scope="col">Values</th>
+                <th scope="col">Example</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>type</td>
+                <td th:if="${user2UserPossible != null && user2UserPossible == true}">
+                    <table class="table" style="border-collapse: separate">
+                        <tr>
+                            <td style="vertical-align: middle">User-User</td>
+                            <td>
+                                <div th:each="f,rowStatus : ${userToUserInteractionTypeFields}" class="row card-columns"
+                                     th:if="${rowStatus.index % 3 == 0}">
+                                    <div th:each="f,interestStatus : ${userToUserInteractionTypeFields}" class="col-md-4 domain-card"
+                                         th:if="${interestStatus.index lt rowStatus.index + 3 and interestStatus.index ge rowStatus.index}">
+                                        <h4>
+                                            <span class="badge bg-warning" style="color: black"
+                                                  th:title="${f.minRating != null && f.maxRating != null} ? 'From ' + ${f.minRating} + ' To ' + ${f.maxRating}">
+                                                <label th:text="${f.name}"></label>
+                                                <i th:if="${f.minRating != null && f.maxRating != null}" class="bi bi-info-circle"></i>
+                                            </span>
+                                        </h4>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="vertical-align: middle">User-Item</td>
+                            <td>
+                                <div th:each="f,rowStatus : ${userToItemInteractionTypeFields}" class="row card-columns"
+                                     th:if="${rowStatus.index % 3} == 0">
+                                    <div th:each="f,interestStatus : ${userToItemInteractionTypeFields}" class="col-md-4 domain-card"
+                                         th:if="${interestStatus.index lt rowStatus.index + 3 and interestStatus.index ge rowStatus.index}">
+                                        <h4>
+                                    <span class="badge bg-warning" style="color: black"
+                                          th:if="${f.subtype == null}"
+                                          th:title="${f.minRating != null && f.maxRating != null} ? 'From ' + ${f.minRating} + ' To ' + ${f.maxRating}">
+                                        <label th:text="${f.name}"></label>
+                                        <i th:if="${f.minRating != null && f.maxRating != null}" class="bi bi-info-circle"></i>
+                                    </span>
+                                        </h4>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                    </table>
+                </td>
+                <td th:if="${user2UserPossible == null}">
+                    <table class="table" style="border-collapse: separate">
+                        <div th:each="f,rowStatus : ${interactionTypeFields}" class="row card-columns"
+                             th:if="${rowStatus.index % 3 == 0}">
+                            <div th:each="f,interestStatus : ${interactionTypeFields}" class="col-md-4 domain-card"
+                                 th:if="${interestStatus.index lt rowStatus.index + 3 and interestStatus.index ge rowStatus.index}">
+                                <h4>
+                                    <span class="badge bg-warning" style="color: black"
+                                          th:title="${f.minRating != null && f.maxRating != null} ? 'From ' + ${f.minRating} + ' To ' + ${f.maxRating}">
+                                        <label th:text="${f.name}"></label>
+                                        <i th:if="${f.minRating != null && f.maxRating != null}" class="bi bi-info-circle"></i>
+                                    </span>
+                                </h4>
+                            </div>
+                        </div>
+                    </table>
+                </td>
+                <td style="vertical-align: middle">
+                    <table th:if="${not #lists.isEmpty(interactionTypeFields)}" style="border-collapse: separate">
+                        <tr>
+                            <td>
+                                <label th:text="'&quot;type&quot;: ' + '&quot;' + ${interactionTypeField} + '&quot;'"></label>
+                            </td>
+                            <td th:if="${interactionRatingField != null}" style="padding-left: 30px">
+                                <label th:text="'&quot;type&quot;: ' + '&quot;' + ${interactionRatingField} + '&quot;,'"></label><br>
+                                <label>"value": 1</label>
+                            </td>
+                        </tr>
+                    </table>
+
+                    <br th:if="${interactionRatingField != null}">
+
+                </td>
+            </tr>
+            <tr th:if="${userTypeChecked == 'registered' || userTypeChecked == 'both'}">
+                <td>user_id</td>
+                <td style="padding-left: 12px"><h4><span class="badge bg-warning" style="color: black">registered user</span></h4></td>
+                <td><label>"user_id": "some-registered-user-id"</label></td>
+            </tr>
+            <tr th:if="${userTypeChecked == 'anonymous' || userTypeChecked == 'both'}">
+                <td>session_id</td>
+                <td style="padding-left: 12px"><h4><span class="badge bg-warning" style="color: black">anonymous user</span></h4></td>
+                <td><label>"session_id": "some-session-id"</label></td>
+            </tr>
+            <tr>
+                <td>ref_user_id</td>
+                <td style="padding-left: 12px"><h4><span class="badge bg-warning" style="color: black" th:text="${user2user != null ? 'yes' : 'no'}"></span></h4></td>
+                <td th:if="${user2user == null}"></td>
+                <td th:if="${user2user != null}">
+                    <table>
+                        <tr><td><label>"user_id": "user_1",</label></td></tr>
+                        <tr><td><label>"ref_user_id": "user_2",</label></td></tr>
+                        <tr><td><label>"item_id": "some-item-id",</label></td></tr>
+                        <tr><td><label>"type": "interaction-type"</label></td></tr>
+                    </table>
+                </td>
+            </tr>
+            <tr>
+                <td>timestamp</td>
+                <td style="padding-left: 12px"><h4><span class="badge bg-warning" style="color: black" th:text="${timestamp != null ? 'yes' : 'no'}"></span></h4></td>
+                <td th:text="${timestamp != null} ? '&quot;timestamp&quot;: &quot;2021-09-14T08:52:42.078Z&quot;'"></td>
+            </tr>
+            <tr>
+                <td>reco_id</td>
+                <td style="padding-left: 12px"><h4><span class="badge bg-warning" style="color: black" data-bs-toggle="tooltip" data-bs-placement="top" title="In case a user has clicked/viewed a recommended item, here you need to include this item id">id <i class="bi bi-info-circle"></i></span></h4></td>
+                <td>
+                    <table>
+                        <tr><td><label>"type": "some-defined-related-type"</label></td></tr>
+                        <tr><td><label>"reco_id": "retrieved-recommendations-id"</label></td></tr>
+                    </table>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+
+</div>
+
+</body>
+</html>
