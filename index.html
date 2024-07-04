@@ -1,15 +1,60 @@
 <!DOCTYPE HTML>
-<html xmlns:th="http://www.thymeleaf.org">
+<html>
 <head>
-    <div th:replace="~{fragments/header :: header-css}"></div>
-    <script src="https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js"></script>
-    <script src="https://unpkg.com/typewriter-effect@latest/dist/core.js"></script>
-
-
+            <!-- This is header-css -->
+            <meta charset="utf-8"/>
+            <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+            <meta name="viewport" content="width=device-width, initial-scale=1"/>
+        
+            <title>Prefer.AI</title>
+        
+            <link rel="icon" href="img/favicon.ico" type="image/x-icon" />
+            <link rel="shortcut icon" href="img/favicon.ico" type="image/x-icon" />
+        
+            <!-- Bootstrap 5 -->
+            <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-+0n0xVW2eSR5OomGNYDnhzAbDsOXxcvSN1TPprVMTNDbiYZCxYbOOl7+AMvyTG2x" crossorigin="anonymous">
+        
+            <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css">
+        
+            <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.5.0/css/all.css" integrity="sha384-B4dIYHKNBt8Bc12p+WXckhzcICo0wtJAoU8YZTY5qE0Id1GSseTk6S+L3BlXeVIU" crossorigin="anonymous">
+        
+            <!-- Style CSS -->
+            <link href="css/style.css" rel="stylesheet"/>
+        
+        
+            <script src="https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js"></script>
+            <script src="https://unpkg.com/typewriter-effect@latest/dist/core.js"></script>
 </head>
 <body>
 
-<div th:replace="~{fragments/header :: header}"></div>
+    <div>
+
+        <nav class="navbar fixed-top navbar-expand-lg navbar-dark bg-dark">
+            <div class="container-fluid">
+    
+    
+                <button class="navbar-toggler" type="button"
+                        data-bs-toggle="collapse"
+                        data-bs-target="#navbarSupportedContent"
+                        aria-controls="navbarSupportedContent"
+                        aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+    
+                <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                    <ul class="navbar-nav ms-auto flex-nowrap">
+                        <li class="nav-item">
+                            <a class="nav-link" aria-current="page" href="/home"  th:classappend="${#httpServletRequest?.requestURI == '/home' || #httpServletRequest?.requestURI == '/' } ? active" >
+                                <i class="bi bi-house"></i><span class="ms-1 d-sm-inline">Home</span></a>
+                        </li>
+    
+    
+                    </ul>
+                </div>
+            </div>
+        </nav>
+    
+    </div>
 
 <header class="page-header">
     <div class="container pt-3">
@@ -29,7 +74,7 @@
 
 
         <div class="col col-md-3">
-                <lottie-player th:src="@{img/lottie/preferai.json}"
+                <lottie-player src="img/lottie/preferai.json"
                                background="transparent"  speed="0.75"
                                style="height: 300px;" autoplay>
                 </lottie-player>
@@ -39,22 +84,14 @@
         <div class="row align-items-center justify-content-center">
             <div class="col-md-12" style="margin-top: 30px; margin-bottom: 15px;">
 
-                <h2 class="text-center" style="margin-bottom: 15px;">
-                    CASE-STUDY: Fashion Personalization at
-                    <img src="https://bethrifty.store/cdn/shop/files/BeThrifty_Logo_512x.png?v=1650893426" height="30px">
-
-                </h2>
-
 
                 <div class="row mt-4">
                     <!-- Fully Personalized Homepage -->
                     <div class="col text-center">
                         <h3 class="sy">Conversational Recommendations</h3>
                         <p>A conversational agent that helps finding the right products.</p>
-                        <img
-                             th:src="@{img/dashboard/conv_icon.png}"
-                             alt="Conversational Recommender Systems" width="100px"
-                        />
+                        <img src="img/dashboard/conv_icon.png" alt="Conversational Recommender Systems" width="100px" />
+
                     </div>
                 </div>
 
@@ -157,7 +194,7 @@
 
             <div class="col-md-7">
                 <img style="margin-top: 50px;"
-                     th:src="@{img/preferai/PreferAI_Infographic_web-LS1500px_SW-RZ-vekt2.png}"
+                     src="img/preferai/PreferAI_Infographic_web-LS1500px_SW-RZ-vekt2.png"
                      alt="Uptrendz Infographic" width="100%"
                 />
             </div>
@@ -243,7 +280,7 @@
                 <div class="icon syh mb-4">
 
                     <img
-                            th:src="@{img/icons/domains/icon_ecommerce.svg}"
+                            src="img/icons/domains/icon_ecommerce.svg"
                             alt="E-Commerce"
                             class="img-fluid"
                     />
@@ -262,7 +299,7 @@
                 <div class="icon eth mb-4">
 
                     <img
-                            th:src="@{img/icons/domains/icon_news.svg}"
+                            src="img/icons/domains/icon_news.svg"
                             alt="News Article"
                             class="img-fluid"
                     />
@@ -281,7 +318,7 @@
                 <div class="icon syh mb-4">
 
                     <img
-                            th:src="@{img/icons/domains/icon_gaming.svg}"
+                            src="img/icons/domains/icon_gaming.svg"
                             alt="Online Gaming"
                             class="img-fluid"
                     />
@@ -302,7 +339,7 @@
             <div class="col-md-3">
                 <div class="icon eth mb-4">
                     <img
-                            th:src="@{img/icons/domains/icon_health.svg}"
+                            src="img/icons/domains/icon_health.svg"
                             alt="Health"
                             class="img-fluid"
                     />
@@ -317,7 +354,7 @@
                 <div class="icon eth mb-4">
 
                     <img
-                            th:src="@{img/icons/domains/icon_music.svg}"
+                            src="img/icons/domains/icon_music.svg"
                             alt="Music"
                             class="img-fluid"
                     />
@@ -335,7 +372,7 @@
             <div class="col-md-3">
                 <div class="icon syh mb-4">
                     <img
-                            th:src="@{img/icons/domains/icon_tourism.svg}"
+                            src="img/icons/domains/icon_tourism.svg"
                             alt="Tourism"
                             class="img-fluid"
                     />
@@ -353,7 +390,7 @@
             <div class="col-md-3">
                 <div class="icon eth mb-4">
                     <img
-                            th:src="@{img/icons/domains/icon_elearning.svg}"
+                            src="img/icons/domains/icon_elearning.svg"
                             alt="E-learning"
                             class="img-fluid"
                     />
@@ -371,7 +408,7 @@
             <div class="col-md-3">
                 <div class="icon syh mb-4">
                     <img
-                            th:src="@{img/icons/domains/icon_finance.svg}"
+                            src="img/icons/domains/icon_finance.svg"
                             alt="Finance"
                             class="img-fluid"
                     />
@@ -391,7 +428,7 @@
             <div class="col-md-3">
                 <div class="icon syh mb-4">
                     <img
-                            th:src="@{img/icons/domains/icon_hr.svg}"
+                            src="img/icons/domains/icon_hr.svg"
                             alt="Human Resources"
                             class="img-fluid"
                     />
@@ -409,7 +446,7 @@
             <div class="col-md-3">
                 <div class="icon eth mb-4">
                     <img
-                            th:src="@{img/icons/domains/icon_video.svg}"
+                            src="img/icons/domains/icon_video.svg"
                             alt="Videos"
                             class="img-fluid"
                     />
@@ -427,7 +464,7 @@
             <div class="col-md-3">
                 <div class="icon syh mb-4">
                     <img
-                            th:src="@{img/icons/domains/icon_event.svg}"
+                            src="img/icons/domains/icon_event.svg"
                             alt="Events"
                             class="img-fluid"
                     />
@@ -445,7 +482,7 @@
             <div class="col-md-3">
                 <div class="icon eth mb-4">
                     <img
-                            th:src="@{img/icons/domains/icon_insurance.svg}"
+                            src="img/icons/domains/icon_insurance.svg"
                             alt="Insurance"
                             class="img-fluid"
                     />
@@ -547,7 +584,45 @@
 
 </section>
 
-<div th:replace="~{fragments/footer :: footer}"></div>
+<footer>
+
+
+    <div class="container" style="padding-bottom: 25px; padding-top: 150px;">
+        <div class="row align-items-center justify-content-center">
+            <div class="col-md-4">
+
+                <p><strong>Prefer AI d.o.o.<br>
+                </strong>AI powered Customer Experience</p>
+
+
+            </div>
+
+            <div class="col-md-4">
+
+                <p>
+                    10000 Zagreb<br>
+                    E-Mail: <a href="mailto:info@preferai.hr">info@preferai.hr</a><br>
+                    Internet: <a href="http://preferai.hr">http://preferai.hr</a></p>
+
+            </div>
+
+            <div class="col-md-4">
+
+                <p>
+                    <a class="nav-link active" aria-current="page" href="/policy" style="color: #000000">
+                        <i class="bi bi-shield-plus"></i> <span class="ms-1 d-sm-inline">Privacy Policy</span></a>
+                </p>
+
+
+            </div>
+
+        </div>
+    </div>
+</footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-gtEjrD/SeCtmISkJkNUaaKMoLD0//ElJ19smozuHV6z3Iehds+3Ulb9Bn9Plx0x4" crossorigin="anonymous"></script>
+
+
 <script>
     var app = document.getElementById('typed');
     console.log("fooo")
